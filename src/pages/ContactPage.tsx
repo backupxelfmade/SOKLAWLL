@@ -43,9 +43,7 @@ const ContactPage = () => {
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
 
-      setTimeout(() => {
-        setSubmitStatus('idle');
-      }, 5000);
+      setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
       console.error('Error sending message:', error);
       setSubmitStatus('error');
@@ -61,19 +59,20 @@ const ContactPage = () => {
 
       <div className="pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
           {/* Header */}
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Get In Touch
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Get In Touch</h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Have a legal matter or question? We're here to help. Reach out to us and we'll respond as soon as possible.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 mb-16">
+
             {/* Contact Info Cards */}
             <div className="lg:col-span-1 space-y-6">
+
               {/* Office Location */}
               <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-start space-x-4">
@@ -136,6 +135,7 @@ const ContactPage = () => {
                   </div>
                 </div>
               </div>
+
             </div>
 
             {/* Contact Form */}
@@ -163,69 +163,33 @@ const ContactPage = () => {
                   </div>
                 )}
 
-                <div className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent transition-all"
-                        placeholder="John Doe"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                      <input type="text" name="name" value={formData.name} onChange={handleChange}
+                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent transition-all"
-                        placeholder="john@example.com"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                      <input type="email" name="email" value={formData.email} onChange={handleChange}
+                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent transition-all"
-                        placeholder="+254 700 123 456"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
                     </div>
 
                     <div>
-                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                        Subject *
-                      </label>
-                      <select
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent transition-all"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                      <select name="subject" value={formData.subject} onChange={handleChange}
+                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent">
                         <option value="">Select a subject</option>
                         <option value="General Inquiry">General Inquiry</option>
                         <option value="Corporate Law">Corporate Law</option>
@@ -240,27 +204,14 @@ const ContactPage = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent transition-all resize-none"
-                      placeholder="Tell us about your legal matter..."
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea name="message" value={formData.message} onChange={handleChange}
+                      rows={6} required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none"></textarea>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
+                  <button type="submit" disabled={isSubmitting}
+                    className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50">
                     {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -273,74 +224,32 @@ const ContactPage = () => {
                       </>
                     )}
                   </button>
-                </div>
+
+                </form>
               </div>
             </div>
+
           </div>
 
-          {/* Map */}
+          {/* ⭐ UPDATED MAP SECTION ⭐ */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 bg-gradient-to-r from-[#bfa06f] to-[#a08a5f]">
               <h2 className="text-2xl font-bold text-white">Find Us</h2>
-              <p className="text-white/90 mt-1">Visit our office in Upperhill, Nairobi</p>
+              <p className="text-white/90 mt-1">Visit our office</p>
             </div>
+
             <div className="relative w-full h-96">
-              <a 
-                href="https://www.google.com/maps/search/?api=1&query=Upperhill+Gardens+Ragati+Road+Nairobi+Kenya"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full h-full relative group cursor-pointer overflow-hidden"
-              >
-                {/* Static Map Image Background */}
-                <img
-                  src="https://maps.googleapis.com/maps/api/staticmap?center=-1.2921,36.8219&zoom=14&size=1200x400&markers=color:0xbfa06f%7C-1.2921,36.8219&style=feature:poi%7Celement:labels%7Cvisibility:off&key=AIzaSyDummyKey"
-                  alt="Map location"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    // Fallback if static map doesn't load
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
-                />
-                
-                {/* Fallback styled map preview */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 hidden items-center justify-center">
-                  <div className="relative">
-                    {/* Map grid pattern */}
-                    <div className="absolute inset-0 opacity-10">
-                      <div className="grid grid-cols-8 grid-rows-6 h-full w-full">
-                        {[...Array(48)].map((_, i) => (
-                          <div key={i} className="border border-gray-400"></div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Location marker */}
-                    <div className="relative z-10 flex flex-col items-center">
-                      <MapPin className="h-20 w-20 text-[#bfa06f] drop-shadow-lg" fill="#bfa06f" />
-                      <div className="mt-4 text-center bg-white px-6 py-3 rounded-lg shadow-lg">
-                        <p className="text-sm font-semibold text-gray-900">Upperhill Gardens</p>
-                        <p className="text-xs text-gray-600">Ragati Road, Nairobi</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white px-6 py-4 rounded-lg shadow-xl">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="h-6 w-6 text-[#bfa06f]" />
-                      <span className="text-gray-900 font-semibold">Click to open in Google Maps</span>
-                      <svg className="h-5 w-5 text-[#bfa06f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </a>
+              <iframe
+                title="Office Map"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.820262983408!2d36.81541707534238!3d-1.2993107356429749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d9103a4f51%3A0xf8f3addf8df84972!2sUpper%20Hill%20Gardens%2C%20Ragati%20Rd%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske"
+                className="w-full h-full border-0"
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
             </div>
           </div>
+
         </div>
       </div>
 
