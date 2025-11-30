@@ -10,19 +10,22 @@ const Hero = () => {
       image: 'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
       title: 'Expert Legal Representation',
       description: 'Providing exceptional legal services with integrity and expertise.',
-      position: 'center 40%' // Adjust to focus on people's faces
+      position: 'center 30%',
+      mobilePosition: 'center 35%'
     },
     {
       image: 'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
       title: 'Comprehensive Legal Solutions',
       description: 'Our experienced team delivers comprehensive legal solutions.',
-      position: 'center 35%' // Adjust to focus on people's faces
+      position: 'center 30%',
+      mobilePosition: 'center 35%'
     },
     {
       image: 'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
       title: 'Your Trusted Legal Partner',
       description: 'Professional excellence combined with genuine care for clients.',
-      position: 'center 45%' // Adjust for outdoor shot
+      position: 'center 50%',
+      mobilePosition: 'center 45%'
     },
   ];
 
