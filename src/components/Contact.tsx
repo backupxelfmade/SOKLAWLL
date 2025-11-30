@@ -1,37 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
-/**
- * Monday.com CRM Integration Configuration
- * 
- * Setup Requirements:
- * 1. Create a Monday.com board with the following columns:
- *    - text: First Name (column ID: 'text')
- *    - text_mkv9gdmd: Last Name (column ID: 'text_mkv9gdmd')
- *    - email: Email Address (column ID: 'email')
- *    - text5: Phone Number (column ID: 'text5')
- *    - dropdown_mkv9sy3b: Legal Service (column ID: 'dropdown_mkv9sy3b')
- *    - long_text: Message (column ID: 'long_text')
- * 
- * 2. Generate API token from Monday.com Developer section
- * 3. Update boardId with your actual board ID
- */
-const MONDAY_CONFIG = {
-  apiUrl: 'https://api.monday.com/v2',
-  apiToken: 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjU1NTg1NzA3MywiYWFpIjoxMSwidWlkIjo4MTM4NDE2NywiaWFkIjoiMjAyNS0wOC0yOVQwMTo0ODowOS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MzEwNDg2MTgsInJnbiI6InVzZTEifQ.u-h44kbC4RMWTLr4q3Ha1ofdXeVSUfz4SvKjJj1dW20',
-  boardId: '9924465558',
-  
-  // Monday.com column mapping - update these IDs to match your board
-  columnMapping: {
-    firstName: 'text', // First name column
-    lastName: 'text_mkv9gdmd', // Last name column
-    email: 'email', // Email column
-    phone: 'text5', // Phone column
-    legalService: 'long_text_mkvabq2g', // Service dropdown column
-    message: 'long_text_mkvam9kb' // Message column
-  }
-};
-
 // Form validation rules
 const VALIDATION_RULES = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -52,7 +21,6 @@ const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('idle');
   const [validationErrors, setValidationErrors] = useState({});
-  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -127,105 +95,10 @@ const Contact = () => {
   };
 
   /**
-   * Submit form data to Monday.com CRM
-   * Implements robust error handling and retry logic
+   * Main form submission handler
    */
-  const submitToMonday = async (formData) => {
-    try {
-      // Prepare column values for Monday.com API
-      const columnValues = {};
-      
-      // Map form fields to Monday.com columns with proper data types
-      if (formData.firstName) {
-        columnValues[MONDAY_CONFIG.columnMapping.firstName] = formData.firstName;
-      }
-      if (formData.lastName) {
-        columnValues[MONDAY_CONFIG.columnMapping.lastName] = formData.lastName;
-      }
-      if (formData.email) {
-        // Email columns require specific format
-        columnValues[MONDAY_CONFIG.columnMapping.email] = {
-          email: formData.email,
-          text: formData.email
-        };
-      }
-      if (formData.phone) {
-        // Phone stored as text column
-        columnValues[MONDAY_CONFIG.columnMapping.phone] = formData.phone;
-      }
-      if (formData.legalService) {
-        // Dropdown columns require labels array format
-        columnValues[MONDAY_CONFIG.columnMapping.legalService] = {
-          labels: [formData.legalService]
-        };
-      }
-      if (formData.message) {
-        columnValues[MONDAY_CONFIG.columnMapping.message] = formData.message;
-      }
-
-      // Create GraphQL mutation for Monday.com
-      const mutation = `
-        mutation {
-          create_item (
-            board_id: ${MONDAY_CONFIG.boardId},
-            item_name: "${formData.firstName} ${formData.lastName} - ${formData.legalService || 'Legal Inquiry'}",
-            column_values: "${JSON.stringify(columnValues).replace(/"/g, '\\"')}"
-          ) {
-            id
-            name
-          }
-        }
-      `;
-
-      // Execute API call with timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(MONDAY_CONFIG.apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': MONDAY_CONFIG.apiToken,
-          'API-Version': '2023-10'
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          query: mutation
-        })
-      });
-      
-      clearTimeout(timeoutId);
-
-      const result = await response.json();
-
-      // Handle Monday.com API errors
-      if (result.errors) {
-        const errorMessage = result.errors[0]?.message || 'Unknown API error';
-        throw new Error(`Monday.com API Error: ${errorMessage}`);
-      }
-      
-      if (!result.data?.create_item) {
-        throw new Error('Failed to create item in Monday.com');
-      }
-
-      return result.data.create_item;
-      
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout - please try again');
-      }
-      console.error('Monday.com submission error:', error);
-      throw error;
-    }
-  };
-
-  /**
-   * Main form submission handler with comprehensive error handling
-   */
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
     // Validate form before submission
     if (!validateForm()) {
@@ -238,63 +111,43 @@ const Contact = () => {
     setValidationErrors({});
 
     try {
-      // Primary strategy: Monday.com API submission
-      try {
-        const result = await submitToMonday(formData);
-        console.log('Successfully submitted to Monday.com:', result.id);
-        setSubmitStatus('success');
-        resetForm();
-        setRetryCount(0); // Reset retry count on success
-        return;
-        
-      } catch (error) {
-        console.warn('Monday.com submission failed:', error.message);
-        
-        // Fallback strategy: Email submission
-        const emailBody = `
-New Contact Form Submission from SOK Law Website:
+      // Prepare email content
+      const emailBody = `
+New Contact Form Submission from SOK Law Website
 
 Contact Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Name: ${formData.firstName} ${formData.lastName}
 Email: ${formData.email}
 Phone: ${formData.phone || 'Not provided'}
 
-Legal Service Requested: ${formData.legalService}
+Legal Service Requested:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${formData.legalService}
 
 Client Message:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${formData.message}
 
 Additional Information:
-- Submission Date: ${new Date().toLocaleString()}
-- Source: Website Contact Form
-- CRM Integration: Failed (using email fallback)
-- Error: ${error.message}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submission Date: ${new Date().toLocaleString()}
+Source: Website Contact Form
 
 Please follow up with this client within 24 hours.
-        `.trim();
+      `.trim();
 
-        const subject = `URGENT: New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
-        const mailtoUrl = `mailto:Info@soklaw.co.ke?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-        
-        // Open email client
-        window.open(mailtoUrl, '_blank');
-        
-        setSubmitStatus('email_fallback');
-        resetForm();
-      }
+      const subject = `New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
+      const mailtoUrl = `mailto:xelfmade3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Open email client
+      window.location.href = mailtoUrl;
+      
+      setSubmitStatus('success');
+      resetForm();
 
     } catch (error) {
       console.error('Form submission error:', error);
-      
-      // Implement retry logic for network errors
-      if (retryCount < 2 && (error instanceof Error && (error.message.includes('network') || error.message.includes('timeout')))) {
-        setRetryCount(prev => prev + 1);
-        setTimeout(() => {
-          handleSubmit();
-        }, 1000 * (retryCount + 1)); // Exponential backoff
-        return;
-      }
-      
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -314,16 +167,6 @@ Please follow up with this client within 24 hours.
       message: ''
     });
     setValidationErrors({});
-    setRetryCount(0);
-  };
-
-  /**
-   * Handle retry after error
-   */
-  const handleRetry = () => {
-    setSubmitStatus('idle');
-    setRetryCount(0);
-    handleSubmit();
   };
 
   const officeInfo = [
@@ -583,17 +426,8 @@ Please follow up with this client within 24 hours.
                   aria-label={isSubmitting ? 'Sending message...' : 'Send message'}
                   className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
                 >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                      {retryCount > 0 ? `Retrying... (${retryCount}/2)` : 'Sending...'}
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Send Message
-                    </>
-                  )}
+                  <Send className="w-4 h-4" />
+                  Send Message
                 </button>
               </form>
 
@@ -615,19 +449,8 @@ Please follow up with this client within 24 hours.
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 mt-0.5 text-green-600 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Message sent successfully!</p>
-                      <p className="text-sm">Your inquiry has been submitted to our CRM system. We'll contact you within 24 hours.</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Email Fallback Success */}
-                {submitStatus === 'email_fallback' && (
-                  <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-xl flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 mt-0.5 text-blue-600 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Message prepared for email!</p>
-                      <p className="text-sm">Your email client should open with your message. Please send it to complete your inquiry.</p>
+                      <p className="font-medium">Email client opened!</p>
+                      <p className="text-sm">Please send the email from your email client to complete your inquiry. We'll respond within 24 hours.</p>
                     </div>
                   </div>
                 )}
@@ -637,14 +460,8 @@ Please follow up with this client within 24 hours.
                   <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 mt-0.5 text-red-600 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Unable to submit your message</p>
-                      <p className="text-sm">Please try again or contact us directly at Info@soklaw.co.ke</p>
-                      <button
-                        onClick={handleRetry}
-                        className="mt-2 text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-colors"
-                      >
-                        Try Again
-                      </button>
+                      <p className="font-medium">Unable to open email client</p>
+                      <p className="text-sm">Please contact us directly at xelfmade3@gmail.com</p>
                     </div>
                   </div>
                 )}
