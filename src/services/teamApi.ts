@@ -11,6 +11,31 @@ export interface TeamMember {
   phone: string;
   linkedin?: string;
   is_partner: boolean;
+  qualifications?: string;
+  experience: string;
+  achievements?: string;
+  description: string;
+  expertise?: string;
+  education?: string;
+  admissions?: string;
+  languages?: string;
+  display_order?: number;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface TeamMemberFormatted {
+  id: string;
+  name: string;
+  role: string;
+  category: string;
+  specialization: string;
+  image: string;
+  email: string;
+  phone: string;
+  linkedin?: string;
+  isPartner: boolean;
   qualifications: string[];
   experience: string;
   achievements: string[];
@@ -19,46 +44,69 @@ export interface TeamMember {
   education: string[];
   admissions: string[];
   languages: string[];
-  created_at?: string;
-  updated_at?: string;
 }
 
 export const teamApi = {
-  async fetchAll(): Promise<TeamMember[]> {
+  async fetchAll(): Promise<TeamMemberFormatted[]> {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
-      .order('category', { ascending: true })
-      .order('name', { ascending: true });
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
 
     if (error) {
       console.error('Error fetching team members:', error);
       throw new Error(`Failed to fetch team members: ${error.message}`);
     }
 
-    return data || [];
+    return (data || []).map(this.formatTeamMember);
   },
 
-  async fetchByCategory(category: string): Promise<TeamMember[]> {
+  formatTeamMember(member: TeamMember): TeamMemberFormatted {
+    return {
+      id: member.id,
+      name: member.name,
+      role: member.role,
+      category: member.category,
+      specialization: member.specialization,
+      image: member.image,
+      email: member.email,
+      phone: member.phone,
+      linkedin: member.linkedin,
+      isPartner: member.is_partner,
+      qualifications: member.qualifications ? member.qualifications.split(',').map(s => s.trim()) : [],
+      experience: member.experience,
+      achievements: member.achievements ? member.achievements.split(',').map(s => s.trim()) : [],
+      description: member.description,
+      expertise: member.expertise ? member.expertise.split(',').map(s => s.trim()) : [],
+      education: member.education ? member.education.split(',').map(s => s.trim()) : [],
+      admissions: member.admissions ? member.admissions.split(',').map(s => s.trim()) : [],
+      languages: member.languages ? member.languages.split(',').map(s => s.trim()) : []
+    };
+  },
+
+  async fetchByCategory(category: string): Promise<TeamMemberFormatted[]> {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
       .eq('category', category)
-      .order('name', { ascending: true });
+      .eq('is_active', true)
+      .order('display_order', { ascending: true });
 
     if (error) {
       console.error('Error fetching team members by category:', error);
       throw new Error(`Failed to fetch team members: ${error.message}`);
     }
 
-    return data || [];
+    return (data || []).map(this.formatTeamMember);
   },
 
-  async fetchById(id: string): Promise<TeamMember | null> {
+  async fetchById(id: string): Promise<TeamMemberFormatted | null> {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
       .eq('id', id)
+      .eq('is_active', true)
       .maybeSingle();
 
     if (error) {
@@ -66,7 +114,7 @@ export const teamApi = {
       throw new Error(`Failed to fetch team member: ${error.message}`);
     }
 
-    return data;
+    return data ? this.formatTeamMember(data) : null;
   },
 
   async create(member: Omit<TeamMember, 'id' | 'created_at' | 'updated_at'>): Promise<TeamMember> {
