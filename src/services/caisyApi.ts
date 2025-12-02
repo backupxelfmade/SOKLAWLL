@@ -1,5 +1,5 @@
 const CAISY_API_KEY = 'f2iiXhHIObO05aNEle1vDlaDq0iGHmbr';
-const CAISY_PROJECT_ID = '[PROJECT_ID]';
+const CAISY_PROJECT_ID = '7763a144-9074-4dc5-a2f5-e2521e343d6b';
 const CAISY_GRAPHQL_ENDPOINT = `https://cloud.caisy.io/api/v3/e/${CAISY_PROJECT_ID}/graphql`;
 
 export interface BlogPost {
