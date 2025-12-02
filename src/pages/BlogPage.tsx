@@ -130,7 +130,7 @@ const BlogPage: React.FC = () => {
                     {post.author && (
                       <div className="flex items-center gap-1">
                         <User className="w-4 h-4" />
-                        <span>{post.author.name}</span>
+                        <span>{post.author}</span>
                       </div>
                     )}
                   </div>

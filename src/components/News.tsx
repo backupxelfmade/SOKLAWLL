@@ -179,7 +179,7 @@ const News = () => {
                     <div className="flex items-center mt-4 pt-4 border-t border-gray-100">
                       <User className="h-4 w-4 text-gray-400 mr-2" />
                       <span className="text-sm text-gray-600">
-                        {post.author.name}
+                        {post.author}
                       </span>
                     </div>
                   )}

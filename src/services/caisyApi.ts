@@ -13,16 +13,29 @@ export interface BlogPost {
     src: string;
     title: string;
   };
-  author?: {
-    name: string;
+  author?: string;
+}
+
+interface CaisyBlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  author?: string;
+  publishedDate: string;
+  featuredImage?: {
+    src: string;
+    title: string;
+  };
+  content?: {
+    json: any;
   };
 }
 
 interface CaisyResponse {
   data: {
-    allBlogPost: {
+    allBlog: {
       edges: Array<{
-        node: BlogPost;
+        node: CaisyBlogPost;
       }>;
     };
   };
@@ -56,24 +69,48 @@ const fetchFromCaisy = async (query: string): Promise<CaisyResponse> => {
   }
 };
 
+const convertCaisyContentToHTML = (content: any): string => {
+  if (!content || !content.json) return '';
+
+  try {
+    const doc = content.json;
+    if (!doc.content || !Array.isArray(doc.content)) return '';
+
+    return doc.content.map((node: any) => {
+      if (node.type === 'paragraph') {
+        const text = node.content?.map((c: any) => c.text || '').join('') || '';
+        return `<p>${text}</p>`;
+      }
+      return '';
+    }).join('');
+  } catch (e) {
+    return '';
+  }
+};
+
+const extractExcerpt = (content: any, maxLength: number = 200): string => {
+  const html = convertCaisyContentToHTML(content);
+  const text = html.replace(/<[^>]*>/g, '');
+  return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+};
+
 export const getAllBlogPosts = async (): Promise<BlogPost[]> => {
   const query = `
     query AllBlogPosts {
-      allBlogPost {
+      allBlog {
         edges {
           node {
             id
             title
             slug
-            excerpt
-            content
+            author
             publishedDate
             featuredImage {
               src
               title
             }
-            author {
-              name
+            content {
+              json
             }
           }
         }
@@ -82,7 +119,19 @@ export const getAllBlogPosts = async (): Promise<BlogPost[]> => {
   `;
 
   const response = await fetchFromCaisy(query);
-  return response.data.allBlogPost.edges.map(edge => edge.node);
+  return response.data.allBlog.edges.map(edge => {
+    const node = edge.node;
+    return {
+      id: node.id,
+      title: node.title,
+      slug: node.slug,
+      author: node.author,
+      publishedDate: node.publishedDate,
+      featuredImage: node.featuredImage,
+      content: convertCaisyContentToHTML(node.content),
+      excerpt: extractExcerpt(node.content)
+    };
+  });
 };
 
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
