@@ -4,22 +4,23 @@ export interface TeamMember {
   id: string;
   name: string;
   role: string;
-  category: 'Partners' | 'Associates' | 'Consultants' | 'Assistants';
+  category: string;
   specialization: string;
   image: string;
   email: string;
   phone: string;
-  qualifications: string;
+  linkedin?: string;
+  is_partner: boolean;
+  qualifications: string[];
   experience: string;
-  achievements: string;
+  achievements: string[];
   description: string;
-  expertise: string;
-  education: string;
-  admissions: string;
-  languages: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  expertise: string[];
+  education: string[];
+  admissions: string[];
+  languages: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const teamApi = {
@@ -27,9 +28,8 @@ export const teamApi = {
     const { data, error } = await supabase
       .from('team_members')
       .select('*')
-      .eq('is_active', true)
       .order('category', { ascending: true })
-      .order('created_at', { ascending: true });
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Error fetching team members:', error);
@@ -44,8 +44,7 @@ export const teamApi = {
       .from('team_members')
       .select('*')
       .eq('category', category)
-      .eq('is_active', true)
-      .order('created_at', { ascending: true });
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Error fetching team members by category:', error);

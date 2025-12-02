@@ -2,27 +2,30 @@ import { supabase } from '../lib/supabase';
 
 export interface Service {
   id: string;
-  title: string;
-  description: string;
-  overview: string;
-  icon_name: string;
-  header_image: string;
-  key_services: string;
-  why_choose_us: string;
-  process: string;
   slug: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  title: string;
+  icon: string;
+  description: string;
+  detailed_description?: string;
+  color?: string;
+  icon_color?: string;
+  overview?: string;
+  header_image?: string;
+  key_services?: any[];
+  why_choose_us?: any[];
+  process_steps?: any[];
+  faqs?: any[];
+  related_services?: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const servicesApi = {
   async fetchAll(): Promise<Service[]> {
     const { data, error } = await supabase
-      .from('legal_services')
+      .from('services')
       .select('*')
-      .eq('is_active', true)
-      .order('created_at', { ascending: true });
+      .order('title', { ascending: true });
 
     if (error) {
       console.error('Error fetching services:', error);
@@ -34,7 +37,7 @@ export const servicesApi = {
 
   async fetchById(id: string): Promise<Service | null> {
     const { data, error } = await supabase
-      .from('legal_services')
+      .from('services')
       .select('*')
       .eq('id', id)
       .maybeSingle();
@@ -47,9 +50,9 @@ export const servicesApi = {
     return data;
   },
 
-  async create(service: Omit<Service, 'id' | 'created_at' | 'updated_at'>): Promise<Service> {
+  async create(service: Omit<Service, 'created_at' | 'updated_at'>): Promise<Service> {
     const { data, error } = await supabase
-      .from('legal_services')
+      .from('services')
       .insert([service])
       .select()
       .single();
@@ -64,7 +67,7 @@ export const servicesApi = {
 
   async update(id: string, updates: Partial<Service>): Promise<Service> {
     const { data, error } = await supabase
-      .from('legal_services')
+      .from('services')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -80,7 +83,7 @@ export const servicesApi = {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from('legal_services')
+      .from('services')
       .delete()
       .eq('id', id);
 
@@ -92,13 +95,13 @@ export const servicesApi = {
 
   async subscribeToChanges(callback: (payload: any) => void) {
     const subscription = supabase
-      .channel('legal_services_changes')
+      .channel('services_changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'legal_services',
+          table: 'services',
         },
         callback
       )
