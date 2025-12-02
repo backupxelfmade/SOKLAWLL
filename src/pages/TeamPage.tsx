@@ -76,13 +76,14 @@ const TeamPage = () => {
           ) : (
             <>
               {/* Team Categories */}
-              {Object.entries(teamByCategory).map(([category, members]) => (
-            <div key={category} className="mb-16">
-              <h2 className="text-3xl font-bold mb-8 text-center">
-                {category}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {members.map((member) => (
+              {Object.entries(teamByCategory).map(([category, members]) =>
+                members.length > 0 ? (
+                  <div key={category} className="mb-16">
+                    <h2 className="text-3xl font-bold mb-8 text-center">
+                      {category}
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {members.map((member) => (
                   <div
                     key={member.id}
                     onClick={() => handleMemberClick(member)}
@@ -135,22 +136,27 @@ const TeamPage = () => {
                           >
                             <Phone className="h-5 w-5" />
                           </a>
-                          <a
-                            href="#"
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-12 h-12 flex items-center justify-center bg-gray-200 hover:bg-blue-600 hover:text-white rounded-lg transition-all duration-300"
-                            title="LinkedIn"
-                          >
-                            <Linkedin className="h-5 w-5" />
-                          </a>
+                          {member.linkedin && (
+                            <a
+                              href={member.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-12 h-12 flex items-center justify-center bg-gray-200 hover:bg-blue-600 hover:text-white rounded-lg transition-all duration-300"
+                              title="LinkedIn"
+                            >
+                              <Linkedin className="h-5 w-5" />
+                            </a>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-              ))}
+                      ))}
+                    </div>
+                  </div>
+                ) : null
+              )}
             </>
           )}
         </div>
@@ -201,6 +207,17 @@ const TeamPage = () => {
                             <Phone className="h-4 w-4" />
                             <span className="text-sm">{selectedMember.phone}</span>
                           </a>
+                          {selectedMember.linkedin && (
+                            <a
+                              href={selectedMember.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center space-x-2 text-gray-600 hover:text-yellow-600 transition-colors"
+                            >
+                              <Linkedin className="h-4 w-4" />
+                              <span className="text-sm">LinkedIn Profile</span>
+                            </a>
+                          )}
                         </div>
                       </div>
                     </div>

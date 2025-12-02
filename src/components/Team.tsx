@@ -207,14 +207,18 @@ const Team = () => {
                     >
                       <Phone className="h-5 w-5" />
                     </a>
-                    <a
-                      href="#"
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-12 h-12 flex items-center justify-center bg-gray-200 hover:bg-blue-600 hover:text-white rounded-lg transition-all duration-300"
-                      title="LinkedIn"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
+                    {member.linkedin && (
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-12 h-12 flex items-center justify-center bg-gray-200 hover:bg-blue-600 hover:text-white rounded-lg transition-all duration-300"
+                        title="LinkedIn"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </a>
+                    )}
                   </div>
                 </div>
               </div>

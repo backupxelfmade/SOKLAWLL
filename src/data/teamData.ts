@@ -9,6 +9,7 @@ export interface TeamMember {
   image: string;
   email: string;
   phone: string;
+  linkedin?: string;
   isPartner: boolean;
   qualifications: string[];
   experience: string;
@@ -30,6 +31,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/MGfCq6YL/7X2A2792.jpg',
     email: 'sospeter@soklaw.co.ke',
     phone: '0205285048',
+    linkedin: 'https://www.linkedin.com/in/sospeter-opondo',
     isPartner: true,
     qualifications: ['LLB (Hons)', 'Diploma in Law', 'Certified Public Secretary', 'Management & Customer Care Training'],
     experience: '10+ years of legal practice',
@@ -72,6 +74,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/v8KZvBN1/Whats-App-Image-2025-07-20-at-03-11-55.jpg',
     email: 'paul@soklaw.co.ke',
     phone: '020 528 5048',
+    linkedin: 'https://www.linkedin.com/in/paul-kiranga',
     isPartner: true,
     qualifications: ['LLB (Hons)', 'Diploma in Law'],
     experience: '5+ years in real estate, conveyancing, and bank securities practice',
@@ -112,6 +115,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/0N0wpyV7/Whats-App-Image-2025-11-11-at-00-32-53.jpg',
     email: 'faith@soklaw.co.ke',
     phone: '0205285048',
+    linkedin: 'https://www.linkedin.com/in/faith-simiyu',
     isPartner: true,
     qualifications: ['LLB (Hons)', 'Diploma in Law', 'Certified Public Secretary', 'Management & Customer Care Training'],
     experience: '10+ years of legal practice',
@@ -154,6 +158,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/SKQKDtNL/7X2A2822.jpg',
     email: 'angela@soklaw.co.ke',
     phone: '+254 700 123 457',
+    linkedin: 'https://www.linkedin.com/in/angela-omuya',
     isPartner: true,
     qualifications: ['LLB (Hons)', 'CPA-K'],
     experience: '10+ years of legal and compliance practice',
@@ -193,6 +198,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/c4q4VJLL/Whats-App-Image-2025-08-13-at-04-23-09.jpg',
     email: 'kennedy@soklaw.co.ke',
     phone: '+254 700 123 458',
+    linkedin: 'https://www.linkedin.com/in/kennedy-muriuki',
     isPartner: false,
     qualifications: ['LLB (Hons)', 'Diploma in Law', 'Notary Public', 'Commissioner for Oaths'],
     experience: '7+ years of legal experience, 5+ years in active practice',
@@ -233,6 +239,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/PqFdKX7h/7X2A2896.jpg',
     email: 'geoffrey@soklaw.co.ke',
     phone: '+254 700 123 459',
+    linkedin: 'https://www.linkedin.com/in/geoffrey-otieno',
     isPartner: false,
     qualifications: ['LLB (Hons)'],
     experience: '4 years of legal practice',
@@ -271,6 +278,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/Z5KYK43F/7X2A2863.jpg',
     email: 'loise@soklaw.co.ke',
     phone: '+254 700 123 460',
+    linkedin: 'https://www.linkedin.com/in/loise-njoroge',
     isPartner: false,
     qualifications: ['LLB (Hons)'],
     experience: '4+ years of legal practice',
@@ -307,6 +315,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/ncYZgYW3/7X2A2853.jpg',
     email: 'justus@soklaw.co.ke',
     phone: '+254 700 123 461',
+    linkedin: 'https://www.linkedin.com/in/justus-njoroge',
     isPartner: false,
     qualifications: ['Diploma in Legal Studies', 'Certificate in Conveyancing Practice'],
     experience: '3+ years in conveyancing and property documentation',
@@ -344,6 +353,7 @@ export const teamMembers: TeamMember[] = [
     image: 'https://i.postimg.cc/FFVBQW9k/7-X2-A2882-1.jpg',
     email: 'shallet@soklaw.co.ke',
     phone: '+254 700 123 462',
+    linkedin: 'https://www.linkedin.com/in/shallet-katiku',
     isPartner: false,
     qualifications: ['Certificate in Customer Service', 'Diploma in Business Administration'],
     experience: '2+ years in client service and administrative support',
