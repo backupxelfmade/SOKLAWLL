@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const BlogPage: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -37,7 +39,9 @@ const BlogPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-slate-900 mb-4">Blog</h1>
@@ -58,12 +62,16 @@ const BlogPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-slate-900 mb-4">Blog</h1>
@@ -74,11 +82,15 @@ const BlogPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-slate-900 mb-4">Blog</h1>
@@ -146,6 +158,8 @@ const BlogPage: React.FC = () => {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 };
 

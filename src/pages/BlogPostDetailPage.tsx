@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug, BlogPost } from '../services/caisyApi';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const BlogPostDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -49,7 +51,9 @@ const BlogPostDetailPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
             <div className="h-8 bg-slate-200 rounded w-24 mb-8" />
@@ -67,12 +71,16 @@ const BlogPostDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
+      </>
     );
   }
 
   if (error || !post) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             to="/blog"
@@ -86,11 +94,15 @@ const BlogPostDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           to="/blog"
@@ -158,6 +170,8 @@ const BlogPostDetailPage: React.FC = () => {
         </div>
       </article>
     </div>
+    <Footer />
+    </>
   );
 };
 
