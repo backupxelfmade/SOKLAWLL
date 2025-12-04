@@ -72,7 +72,7 @@ const Services = () => {
               <p className="text-gray-600">Loading services...</p>
             </div>
           ) : (
-            servicesToDisplay.map((service, index) => (
+            servicesToDisplay.slice(0, 4).map((service, index) => (
               <div
                 key={service.id || index}
                 className="relative service-card overflow-hidden rounded-3xl group opacity-0 cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-2xl"
