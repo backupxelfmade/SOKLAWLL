@@ -194,7 +194,7 @@ const Footer = () => {
                 className="flex items-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white px-4 py-2 rounded-lg transition-colors duration-300"
               >
                 <Newspaper className="h-4 w-4" />
-                Latest blogs
+                Latest Blogs
               </button>
             </div>
           </div>
