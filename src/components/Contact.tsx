@@ -408,12 +408,9 @@ Source: Website Contact Form
                     <option value="Bank Securities and Real Estate">Bank Securities and Real Estate</option>
                     <option value="Employment Law">Employment Law</option>
                     <option value="Family Law">Family Law</option>
-                    <option value="Energy Law">Energy Law</option>
-                    <option value="Construction Law">Construction Law</option>
                     <option value="Health and Medical Law">Health and Medical Law</option>
                     <option value="Finance and Banking Law">Finance and Banking Law</option>
                     <option value="Insurance and Personal Injury">Insurance and Personal Injury</option>
-                    <option value="Agricultural Law">Agricultural Law</option>
                     <option value="Legal Consultancy">Legal Consultancy</option>
                     <option value="Other">Other</option>
                   </select>
