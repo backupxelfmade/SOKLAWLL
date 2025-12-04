@@ -5,28 +5,24 @@ import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'luci
 const VALIDATION_RULES = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: /^[\+]?[0-9\s\-\(\)]{10,}$/,
-  required: ['firstName', 'lastName', 'email', 'legalService', 'message']
+  required: ['name', 'email', 'subject', 'message']
 };
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phone: '',
-    legalService: '',
+    subject: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('idle');
   const [validationErrors, setValidationErrors] = useState({});
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
@@ -94,15 +90,15 @@ New Contact Form Submission from SOK Law Website
 CONTACT INFORMATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Name: ${formData.firstName} ${formData.lastName}
+Name: ${formData.name}
 Email: ${formData.email}
 Phone: ${formData.phone || 'Not provided'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LEGAL SERVICE REQUESTED
+SUBJECT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${formData.legalService}
+${formData.subject}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CLIENT MESSAGE
@@ -127,7 +123,7 @@ Source: Website Contact Form
 ⚠️ Please follow up with this client within 24 hours.
       `.trim();
 
-      const subject = `New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
+      const subject = `New Contact Request - ${formData.subject} - ${formData.name}`;
       
       // Create Gmail compose URL
       const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@soklaw.co.ke&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
@@ -155,11 +151,10 @@ Source: Website Contact Form
    */
   const resetForm = () => {
     setFormData({
-      firstName: '',
-      lastName: '',
+      name: '',
       email: '',
       phone: '',
-      legalService: '',
+      subject: '',
       message: ''
     });
     setValidationErrors({});
@@ -251,68 +246,38 @@ Source: Website Contact Form
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Request a Consultation</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
 
-                <div className="space-y-4">
-                  {/* First Name and Last Name Row */}
-                  <div className="grid md:grid-cols-2 gap-4">
+                <form className="space-y-6" onSubmit={handleSubmit}>
+
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        placeholder="Your first name"
-                        autoComplete="given-name"
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                      <input 
+                        type="text" 
+                        name="name" 
+                        value={formData.name} 
+                        onChange={handleChange}
+                        placeholder="Your full name"
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                          validationErrors.firstName 
+                          validationErrors.name 
                             ? 'border-red-500 focus:border-red-500' 
                             : 'border-gray-300 focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent'
                         }`}
                       />
-                      {validationErrors.firstName && (
-                        <p className="text-red-500 text-sm mt-1">{validationErrors.firstName}</p>
+                      {validationErrors.name && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
                       )}
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        placeholder="Your last name"
-                        autoComplete="family-name"
-                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                          validationErrors.lastName 
-                            ? 'border-red-500 focus:border-red-500' 
-                            : 'border-gray-300 focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent'
-                        }`}
-                      />
-                      {validationErrors.lastName && (
-                        <p className="text-red-500 text-sm mt-1">{validationErrors.lastName}</p>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Email and Phone Row */}
-                  <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address *
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                      <input 
+                        type="email" 
+                        name="email" 
+                        value={formData.email} 
+                        onChange={handleChange}
                         placeholder="your.email@example.com"
-                        autoComplete="email"
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
                           validationErrors.email 
                             ? 'border-red-500 focus:border-red-500' 
@@ -323,17 +288,17 @@ Source: Website Contact Form
                         <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
                       )}
                     </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <input 
+                        type="tel" 
+                        name="phone" 
+                        value={formData.phone} 
+                        onChange={handleChange}
                         placeholder="+254 (0) 20 5285048"
-                        autoComplete="tel"
                         className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
                           validationErrors.phone 
                             ? 'border-red-500 focus:border-red-500' 
@@ -344,50 +309,41 @@ Source: Website Contact Form
                         <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
                       )}
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                      <select 
+                        name="subject" 
+                        value={formData.subject} 
+                        onChange={handleChange}
+                        className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
+                          validationErrors.subject 
+                            ? 'border-red-500 focus:border-red-500' 
+                            : 'border-gray-300 focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent'
+                        }`}
+                      >
+                        <option value="">Select a subject</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Corporate Law">Corporate Law</option>
+                        <option value="Litigation">Litigation & Dispute Resolution</option>
+                        <option value="Real Estate">Real Estate & Conveyancing</option>
+                        <option value="Employment Law">Employment & Labour Law</option>
+                        <option value="Family Law">Family & Succession Law</option>
+                        <option value="Criminal Law">Criminal Law</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {validationErrors.subject && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.subject}</p>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Legal Service Required */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Legal Service Required *
-                    </label>
-                    <select
-                      name="legalService"
-                      value={formData.legalService}
-                      onChange={handleInputChange}
-                      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
-                        validationErrors.legalService 
-                          ? 'border-red-500 focus:border-red-500' 
-                          : 'border-gray-300 focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent'
-                      }`}
-                    >
-                      <option value="">Select a service</option>
-                      <option value="Civil and Criminal Litigation">Civil and Criminal Litigation</option>
-                      <option value="Alternative Dispute Resolution">Alternative Dispute Resolution</option>
-                      <option value="Commercial and Corporate Law">Commercial and Corporate Law</option>
-                      <option value="Bank Securities and Real Estate">Bank Securities and Real Estate</option>
-                      <option value="Employment Law">Employment Law</option>
-                      <option value="Family Law">Family Law</option>
-                      <option value="Health and Medical Law">Health and Medical Law</option>
-                      <option value="Finance and Banking Law">Finance and Banking Law</option>
-                      <option value="Insurance and Personal Injury">Insurance and Personal Injury</option>
-                      <option value="Legal Consultancy">Legal Consultancy</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    {validationErrors.legalService && (
-                      <p className="text-red-500 text-sm mt-1">{validationErrors.legalService}</p>
-                    )}
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message *
-                    </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleInputChange}
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea 
+                      name="message" 
+                      value={formData.message} 
+                      onChange={handleChange}
                       placeholder="Please describe your legal matter and how we can help you..."
                       rows={6}
                       maxLength={1000}
@@ -405,9 +361,8 @@ Source: Website Contact Form
                     )}
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    onClick={handleSubmit}
+                  <button 
+                    type="submit" 
                     disabled={isSubmitting}
                     className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
                   >
@@ -423,7 +378,8 @@ Source: Website Contact Form
                       </>
                     )}
                   </button>
-                </div>
+
+                </form>
 
                 {/* Status Messages */}
                 <div className="mt-4 space-y-3">
