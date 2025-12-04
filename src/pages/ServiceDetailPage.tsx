@@ -197,7 +197,7 @@ const ServiceDetailPage = () => {
                     className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     <Phone className="h-5 w-5 text-yellow-600" />
-                    <span>+254 700 123 456</span>
+                    <span>+254 (0) 20 5285048</span>
                   </a>
                   <a
                     href="mailto:info@soklaw.co.ke"
