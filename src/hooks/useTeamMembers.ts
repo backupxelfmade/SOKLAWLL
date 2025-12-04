@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { teamApi, TeamMember } from '../services/teamApi';
+import { teamApi, TeamMemberFormatted } from '../services/teamApi';
 
 interface UseTeamMembersState {
-  members: TeamMember[];
+  members: TeamMemberFormatted[];
   loading: boolean;
   error: string | null;
 }

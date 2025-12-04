@@ -3,26 +3,55 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { servicesData } from '../data/servicesData';
-import { useServices } from '../hooks/useServices';
+import { servicesApi, ServiceFormatted } from '../services/servicesApi';
 import { ArrowLeft, CheckCircle, Phone, Mail } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 const ServiceDetailPage = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
-  const { services: dynamicServices, loading } = useServices();
-  const [service, setService] = useState<any>(null);
+  const [service, setService] = useState<ServiceFormatted | null>(null);
+  const [relatedServices, setRelatedServices] = useState<ServiceFormatted[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const allServices = dynamicServices.length > 0 ? dynamicServices : servicesData;
-    const foundService = allServices.find((s: any) => {
-      if (s.slug) {
-        return s.slug === serviceId;
+    const fetchServiceData = async () => {
+      if (!serviceId) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch the specific service
+        const serviceData = await servicesApi.fetchById(serviceId);
+
+        if (!serviceData) {
+          // Fallback to static data if not found in database
+          const foundService = servicesData.find((s: any) => s.slug === serviceId || s.id === serviceId);
+          setService(foundService || null);
+        } else {
+          setService(serviceData);
+        }
+
+        // Fetch related services
+        const allServices = await servicesApi.fetchAll();
+        const filtered = allServices.filter(s => s.id !== serviceId);
+        setRelatedServices(filtered);
+
+      } catch (err) {
+        console.error('Error fetching service:', err);
+        setError('Failed to load service details');
+        // Fallback to static data
+        const foundService = servicesData.find((s: any) => s.slug === serviceId || s.id === serviceId);
+        setService(foundService || null);
+      } finally {
+        setLoading(false);
       }
-      return s.id === serviceId;
-    });
-    setService(foundService);
-  }, [serviceId, dynamicServices]);
+    };
+
+    fetchServiceData();
+  }, [serviceId]);
 
   // Handle back navigation using browser history
   const handleBackToServices = () => {
@@ -60,32 +89,20 @@ const ServiceDetailPage = () => {
     );
   }
 
-  const IconComponent = service.icon || (Icons as any)[service.icon_name] || Icons.Scale;
-  const keyServices = typeof service.key_services === 'string'
-    ? service.key_services.split('\n')
-    : (service.keyServices || []);
-  const whyChooseUs = typeof service.why_choose_us === 'string'
-    ? service.why_choose_us.split('\n\n').map((item: string) => {
-        const [title, ...descParts] = item.split(': ');
-        return { title, description: descParts.join(': ') };
-      })
-    : (service.whyChooseUs || []);
-  const process = typeof service.process === 'string'
-    ? service.process.split('\n\n').map((item: string) => {
-        const [title, ...descParts] = item.split(': ');
-        return { title, description: descParts.join(': ') };
-      })
-    : (service.process || []);
+  const IconComponent = (Icons as any)[service.icon] || Icons.Scale;
+  const keyServices = service.keyServices || [];
+  const whyChooseUs = service.whyChooseUs || [];
+  const process = service.process || [];
 
   return (
     <>
       <Navbar />
       <div className="pt-20 min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <div 
+        <div
           className="relative py-20 text-white min-h-[500px] flex items-center"
           style={{
-            backgroundImage: `url(${service.header_image || service.headerImage})`,
+            backgroundImage: `url(${service.headerImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
@@ -203,10 +220,9 @@ const ServiceDetailPage = () => {
               <div className="modern-card p-8">
                 <h3 className="text-xl font-bold mb-6">Related Services</h3>
                 <div className="space-y-3">
-                  {(dynamicServices.length > 0 ? dynamicServices : servicesData)
-                    .filter((s: any) => s.id !== service.id)
+                  {relatedServices
                     .slice(0, 4)
-                    .map((relatedService: any) => (
+                    .map((relatedService) => (
                       <button
                         key={relatedService.id}
                         onClick={() => {

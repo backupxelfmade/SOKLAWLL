@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { servicesApi, Service } from '../services/servicesApi';
+import { servicesApi, ServiceFormatted } from '../services/servicesApi';
 
 interface UseServicesState {
-  services: Service[];
+  services: ServiceFormatted[];
   loading: boolean;
   error: string | null;
 }
