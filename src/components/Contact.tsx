@@ -97,8 +97,8 @@ const Contact = () => {
   /**
    * Main form submission handler
    */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = (e) => {
+    if (e) e.preventDefault();
     
     // Validate form before submission
     if (!validateForm()) {
@@ -111,40 +111,61 @@ const Contact = () => {
     setValidationErrors({});
 
     try {
-      // Prepare email content
+      // Prepare email content for Gmail
       const emailBody = `
 New Contact Form Submission from SOK Law Website
 
-Contact Information:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Name: ${formData.firstName} ${formData.lastName}
 Email: ${formData.email}
 Phone: ${formData.phone || 'Not provided'}
 
-Legal Service Requested:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LEGAL SERVICE REQUESTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ${formData.legalService}
 
-Client Message:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLIENT MESSAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ${formData.message}
 
-Additional Information:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Submission Date: ${new Date().toLocaleString()}
+ADDITIONAL INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Submission Date: ${new Date().toLocaleString('en-US', { 
+  weekday: 'long', 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+})}
 Source: Website Contact Form
 
-Please follow up with this client within 24 hours.
+⚠️ Please follow up with this client within 24 hours.
       `.trim();
 
       const subject = `New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
-      const mailtoUrl = `mailto:xelfmade3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       
-      // Open email client
-      window.location.href = mailtoUrl;
+      // Create Gmail compose URL
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=Info@soklaw.co.ke&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Open Gmail in new tab
+      window.open(gmailUrl, '_blank');
       
       setSubmitStatus('success');
-      resetForm();
+      
+      // Reset form after a short delay to allow user to see success message
+      setTimeout(() => {
+        resetForm();
+      }, 3000);
 
     } catch (error) {
       console.error('Form submission error:', error);
@@ -271,7 +292,7 @@ Please follow up with this client within 24 hours.
                 Request a Consultation
               </h3>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-4">
                 {/* First Name and Last Name Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -284,7 +305,6 @@ Please follow up with this client within 24 hours.
                       value={formData.firstName}
                       onChange={handleInputChange}
                       placeholder="Your first name"
-                      required
                       autoComplete="given-name"
                       className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
                         validationErrors.firstName 
@@ -306,7 +326,6 @@ Please follow up with this client within 24 hours.
                       value={formData.lastName}
                       onChange={handleInputChange}
                       placeholder="Your last name"
-                      required
                       autoComplete="family-name"
                       className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
                         validationErrors.lastName 
@@ -332,7 +351,6 @@ Please follow up with this client within 24 hours.
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="your.email@example.com"
-                      required
                       autoComplete="email"
                       className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
                         validationErrors.email 
@@ -376,7 +394,6 @@ Please follow up with this client within 24 hours.
                     name="legalService"
                     value={formData.legalService}
                     onChange={handleInputChange}
-                    required
                     aria-label="Select legal service"
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors appearance-none bg-white pr-12 ${
                       validationErrors.legalService 
@@ -415,7 +432,6 @@ Please follow up with this client within 24 hours.
                     value={formData.message}
                     onChange={handleInputChange}
                     placeholder="Please describe your legal matter and how we can help you..."
-                    required
                     rows={5}
                     maxLength={1000}
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors resize-vertical ${
@@ -434,7 +450,7 @@ Please follow up with this client within 24 hours.
 
                 {/* Submit Button */}
                 <button
-                  type="submit"
+                  onClick={handleSubmit}
                   disabled={isSubmitting}
                   aria-label={isSubmitting ? 'Sending message...' : 'Send message'}
                   className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
@@ -442,7 +458,7 @@ Please follow up with this client within 24 hours.
                   <Send className="w-4 h-4" />
                   Send Message
                 </button>
-              </form>
+              </div>
 
               {/* Status Messages */}
               <div className="mt-4 space-y-3">
@@ -462,8 +478,8 @@ Please follow up with this client within 24 hours.
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 mt-0.5 text-green-600 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Email client opened!</p>
-                      <p className="text-sm">Please send the email from your email client to complete your inquiry. We'll respond within 24 hours.</p>
+                      <p className="font-medium">Gmail opened successfully!</p>
+                      <p className="text-sm">A new Gmail compose window has opened with all the form details. Please review and click send to complete your inquiry.</p>
                     </div>
                   </div>
                 )}
@@ -473,8 +489,8 @@ Please follow up with this client within 24 hours.
                   <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-start gap-3">
                     <AlertCircle className="w-5 h-5 mt-0.5 text-red-600 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Unable to open email client</p>
-                      <p className="text-sm">Please contact us directly at xelfmade3@gmail.com</p>
+                      <p className="font-medium">Unable to open Gmail</p>
+                      <p className="text-sm">Please contact us directly at Info@soklaw.co.ke or try again.</p>
                     </div>
                   </div>
                 )}
