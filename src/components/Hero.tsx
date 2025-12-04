@@ -132,7 +132,7 @@ const Hero = () => {
               }}
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/10 to-black/40"></div>
         </div>
       ))}
 
