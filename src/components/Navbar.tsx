@@ -91,8 +91,8 @@ const Navbar = () => {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#1a1a1a]/20 backdrop-blur-sm'
-          : 'bg-[#f9f7f1]/95 backdrop-blur-md shadow-lg'
+          ? 'bg-[#f9f7f1]/95 backdrop-blur-md shadow-lg'
+          : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
@@ -114,7 +114,7 @@ const Navbar = () => {
               />
             </Link>
             <p className={`text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-semibold tracking-wide leading-tight transition-colors duration-300 ${
-              isScrolled ? 'text-white' : 'text-[#4B3621]'
+              isScrolled ? 'text-[#4B3621]' : 'text-white'
             }`}>
               SIMIYU, OPONDO, KIRANGA & COMPANY ADVOCATES
             </p>
@@ -128,7 +128,7 @@ const Navbar = () => {
                   key={link.href}
                   onClick={() => handleNavigation(link)}
                   className={`px-1 lg:px-2 xl:px-3 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors duration-200 hover:text-yellow-600 relative group ${
-                    isScrolled ? 'text-white' : 'text-gray-700'
+                    isScrolled ? 'text-gray-700' : 'text-white'
                   }`}
                 >
                   {link.label}
@@ -147,7 +147,7 @@ const Navbar = () => {
                 setIsOpen(!isOpen);
               }}
               className={`p-2 rounded-md transition-colors duration-200 relative z-50 ${
-                isScrolled && !isOpen
+                !isScrolled && !isOpen
                   ? 'text-white hover:bg-white/10 bg-black/20'
                   : 'text-gray-700 hover:bg-gray-100 bg-white/90'
               }`}
