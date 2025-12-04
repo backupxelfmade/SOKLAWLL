@@ -39,7 +39,6 @@ const BlogPage: React.FC = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -69,7 +68,6 @@ const BlogPage: React.FC = () => {
   if (error) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -88,7 +86,6 @@ const BlogPage: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
