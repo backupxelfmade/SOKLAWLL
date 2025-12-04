@@ -38,7 +38,6 @@ const TeamPage = () => {
 
   return (
     <>
-      <Navbar />
       <div className="pt-20 min-h-screen brand-section-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           {/* Back Button */}
