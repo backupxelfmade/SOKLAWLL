@@ -371,7 +371,7 @@ Source: Website Contact Form
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      placeholder="+254 700 000 000"
+                      placeholder="+254 (0) 20 5285048"
                       autoComplete="tel"
                       className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
                         validationErrors.phone 
