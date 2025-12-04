@@ -358,14 +358,17 @@ Source: Website Contact Form
                       }`}
                     >
                       <option value="">Select a service</option>
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="Corporate Law">Corporate Law</option>
-                      <option value="Litigation">Litigation & Dispute Resolution</option>
-                      <option value="Real Estate">Real Estate & Conveyancing</option>
-                      <option value="Employment Law">Employment & Labour Law</option>
-                      <option value="Family Law">Family & Succession Law</option>
-                      <option value="Criminal Law">Criminal Law</option>
-                      <option value="Other">Other</option>
+                    <option value="Civil and Criminal Litigation">Civil and Criminal Litigation</option>
+                    <option value="Alternative Dispute Resolution">Alternative Dispute Resolution</option>
+                    <option value="Commercial and Corporate Law">Commercial and Corporate Law</option>
+                    <option value="Bank Securities and Real Estate">Bank Securities and Real Estate</option>
+                    <option value="Employment Law">Employment Law</option>
+                    <option value="Family Law">Family Law</option>
+                    <option value="Health and Medical Law">Health and Medical Law</option>
+                    <option value="Finance and Banking Law">Finance and Banking Law</option>
+                    <option value="Insurance and Personal Injury">Insurance and Personal Injury</option>
+                    <option value="Legal Consultancy">Legal Consultancy</option>
+                    <option value="Other">Other</option>
                     </select>
                     {validationErrors.service && (
                       <p className="text-red-500 text-sm mt-1">{validationErrors.service}</p>
