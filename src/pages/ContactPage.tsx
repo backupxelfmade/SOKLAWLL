@@ -4,10 +4,11 @@ import Footer from '../components/Footer';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
-    subject: '',
+    service: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +41,7 @@ const ContactPage = () => {
       }
 
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', service: '', message: '' });
 
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
@@ -164,51 +165,102 @@ const ContactPage = () => {
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                      <input type="text" name="name" value={formData.name} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                      <input 
+                        type="text" 
+                        name="firstName" 
+                        value={formData.firstName} 
+                        onChange={handleChange}
+                        placeholder="Your first name"
+                        required 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                      <input type="email" name="email" value={formData.email} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                      <input 
+                        type="text" 
+                        name="lastName" 
+                        value={formData.lastName} 
+                        onChange={handleChange}
+                        placeholder="Your last name"
+                        required 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                      />
                     </div>
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                      <input 
+                        type="email" 
+                        name="email" 
+                        value={formData.email} 
+                        onChange={handleChange}
+                        placeholder="your.email@example.com"
+                        required 
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                      />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
-                      <select name="subject" value={formData.subject} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent">
-                        <option value="">Select a subject</option>
-                        <option value="General Inquiry">General Inquiry</option>
-                        <option value="Corporate Law">Corporate Law</option>
-                        <option value="Litigation">Litigation & Dispute Resolution</option>
-                        <option value="Real Estate">Real Estate & Conveyancing</option>
-                        <option value="Employment Law">Employment & Labour Law</option>
-                        <option value="Family Law">Family & Succession Law</option>
-                        <option value="Criminal Law">Criminal Law</option>
-                        <option value="Other">Other</option>
-                      </select>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                      <input 
+                        type="tel" 
+                        name="phone" 
+                        value={formData.phone} 
+                        onChange={handleChange}
+                        placeholder="+254 (0) 20 5285048"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                      />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange}
-                      rows={6} required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none"></textarea>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Legal Service Required *</label>
+                    <select 
+                      name="service" 
+                      value={formData.service} 
+                      onChange={handleChange}
+                      required 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent"
+                    >
+                      <option value="">Select a service</option>
+                      <option value="General Inquiry">General Inquiry</option>
+                      <option value="Corporate Law">Corporate Law</option>
+                      <option value="Litigation">Litigation & Dispute Resolution</option>
+                      <option value="Real Estate">Real Estate & Conveyancing</option>
+                      <option value="Employment Law">Employment & Labour Law</option>
+                      <option value="Family Law">Family & Succession Law</option>
+                      <option value="Criminal Law">Criminal Law</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
 
-                  <button type="submit" disabled={isSubmitting}
-                    className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                    <textarea 
+                      name="message" 
+                      value={formData.message} 
+                      onChange={handleChange}
+                      rows={6} 
+                      required
+                      placeholder="Please describe your legal matter and how we can help you..."
+                      maxLength={1000}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none"
+                    ></textarea>
+                    <div className="text-right text-sm text-gray-500 mt-1">
+                      {formData.message.length}/1000 characters
+                    </div>
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+                  >
                     {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
@@ -228,7 +280,7 @@ const ContactPage = () => {
 
           </div>
 
-          {/* ⭐ UPDATED MAP SECTION ⭐ */}
+          {/* Map Section */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="p-6 bg-gradient-to-r from-[#bfa06f] to-[#a08a5f]">
               <h2 className="text-2xl font-bold text-white">Find Us</h2>
