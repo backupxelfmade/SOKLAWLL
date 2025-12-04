@@ -9,21 +9,18 @@ const Hero = () => {
     {
       image: 'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
       title: 'Expert Legal Representation',
-      description: 'Providing exceptional legal services with integrity and expertise.',
       position: 'center 30%',
       mobilePosition: 'center 35%'
     },
     {
       image: 'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
       title: 'Comprehensive Legal Solutions',
-      description: 'Our experienced team delivers comprehensive legal solutions.',
       position: 'center 30%',
       mobilePosition: 'center 35%'
     },
     {
       image: 'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
       title: 'Your Trusted Legal Partner',
-      description: 'Professional excellence combined with genuine care for clients.',
       position: 'center 50%',
       mobilePosition: 'center 45%'
     },
@@ -135,7 +132,7 @@ const Hero = () => {
               }}
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
         </div>
       ))}
 
@@ -152,21 +149,21 @@ const Hero = () => {
       />
 
       {/* Hero Content */}
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-5xl mx-auto">
-          <div className="animate-fade-in-up mb-8 md:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 text-white leading-tight"
-                style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              {slides[currentSlide].title}
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#f4e4c1] mb-8 md:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-4"
-               style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.9)' }}>
-              {slides[currentSlide].description}
-            </p>
-          </div>
+      <div className="relative z-10 w-full h-full flex flex-col px-4 sm:px-6 lg:px-8">
+        {/* Title at top */}
+        <div className="pt-24 md:pt-32 text-center animate-fade-in-up">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight"
+              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+            {slides[currentSlide].title}
+          </h1>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up-delay px-4">
+        {/* Spacer to push buttons to bottom */}
+        <div className="flex-1"></div>
+
+        {/* Action Buttons at bottom */}
+        <div className="pb-20 md:pb-24">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up-delay px-4 max-w-4xl mx-auto">
             <button
               onClick={scrollToContact}
               className="group bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold rounded-lg flex items-center justify-center space-x-2 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl text-sm sm:text-base md:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto min-w-[280px]"
