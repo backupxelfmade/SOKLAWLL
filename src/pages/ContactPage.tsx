@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import Footer from '../components/Footer';
 
+// Form validation rules
+const VALIDATION_RULES = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^[\+]?[0-9\s\-\(\)]{10,}$/,
+  required: ['firstName', 'lastName', 'email', 'service', 'message']
+};
+
 const ContactPage = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -13,41 +20,133 @@ const ContactPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+    
+    // Clear submit status when user modifies form
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
+    }
   };
 
-  const handleSubmit = async (e) => {
+  /**
+   * Validate form data before submission
+   */
+  const validateForm = () => {
+    const errors = {};
+    
+    // Check required fields
+    VALIDATION_RULES.required.forEach(field => {
+      if (!formData[field] || formData[field].trim() === '') {
+        errors[field] = 'This field is required';
+      }
+    });
+    
+    // Validate email format
+    if (formData.email && !VALIDATION_RULES.email.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    // Validate phone format (optional field)
+    if (formData.phone && !VALIDATION_RULES.phone.test(formData.phone)) {
+      errors.phone = 'Please enter a valid phone number';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      setSubmitStatus('validation_error');
+      return;
+    }
+    
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    setErrorMessage('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      // Prepare email content for Gmail
+      const emailBody = `
+New Contact Form Submission from SOK Law Website
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONTACT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Name: ${formData.firstName} ${formData.lastName}
+Email: ${formData.email}
+Phone: ${formData.phone || 'Not provided'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LEGAL SERVICE REQUESTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formData.service}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLIENT MESSAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+${formData.message}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADDITIONAL INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Submission Date: ${new Date().toLocaleString('en-US', { 
+  weekday: 'long', 
+  year: 'numeric', 
+  month: 'long', 
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+})}
+Source: Website Contact Form
+
+⚠️ Please follow up with this client within 24 hours.
+      `.trim();
+
+      const subject = `New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
+      
+      // Create Gmail compose URL
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@soklaw.co.ke&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Open Gmail in new tab
+      window.open(gmailUrl, '_blank');
+      
       setSubmitStatus('success');
-      setFormData({ firstName: '', lastName: '', email: '', phone: '', service: '', message: '' });
+      
+      // Reset form after a short delay
+      setTimeout(() => {
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          service: '',
+          message: ''
+        });
+        setValidationErrors({});
+      }, 3000);
 
-      setTimeout(() => setSubmitStatus('idle'), 5000);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Form submission error:', error);
       setSubmitStatus('error');
-      setErrorMessage('Failed to send message. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
@@ -110,7 +209,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@soklaw.co.ke" target="_blank" rel="noopener noreferrer" className="text-[#bfa06f] hover:underline text-sm">
+                    <a href="mailto:info@soklaw.co.ke" className="text-[#bfa06f] hover:underline text-sm">
                       info@soklaw.co.ke
                     </a>
                   </div>
@@ -141,22 +240,35 @@ const ContactPage = () => {
               <div className="bg-white rounded-xl shadow-lg p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
 
-                {submitStatus === 'success' && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                {/* Validation Error */}
+                {submitStatus === 'validation_error' && (
+                  <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg flex items-start space-x-3">
+                    <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-green-900">Message Sent Successfully!</h4>
-                      <p className="text-sm text-green-700">We'll get back to you as soon as possible.</p>
+                      <h4 className="font-semibold text-orange-900">Please check your form</h4>
+                      <p className="text-sm text-orange-700">All required fields must be completed with valid information.</p>
                     </div>
                   </div>
                 )}
 
+                {/* Success Message */}
+                {submitStatus === 'success' && (
+                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start space-x-3">
+                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                    <div>
+                      <h4 className="font-semibold text-green-900">Gmail opened successfully!</h4>
+                      <p className="text-sm text-green-700">A new Gmail compose window has opened with all the form details. Please review and click send to complete your inquiry.</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Error Message */}
                 {submitStatus === 'error' && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
                     <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
                     <div>
-                      <h4 className="font-semibold text-red-900">Error Sending Message</h4>
-                      <p className="text-sm text-red-700">{errorMessage}</p>
+                      <h4 className="font-semibold text-red-900">Unable to open Gmail</h4>
+                      <p className="text-sm text-red-700">Please contact us directly at info@soklaw.co.ke or try again.</p>
                     </div>
                   </div>
                 )}
@@ -172,9 +284,13 @@ const ContactPage = () => {
                         value={formData.firstName} 
                         onChange={handleChange}
                         placeholder="Your first name"
-                        required 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent ${
+                          validationErrors.firstName ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
+                      {validationErrors.firstName && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.firstName}</p>
+                      )}
                     </div>
 
                     <div>
@@ -185,9 +301,13 @@ const ContactPage = () => {
                         value={formData.lastName} 
                         onChange={handleChange}
                         placeholder="Your last name"
-                        required 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent ${
+                          validationErrors.lastName ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
+                      {validationErrors.lastName && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.lastName}</p>
+                      )}
                     </div>
                   </div>
 
@@ -200,9 +320,13 @@ const ContactPage = () => {
                         value={formData.email} 
                         onChange={handleChange}
                         placeholder="your.email@example.com"
-                        required 
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent ${
+                          validationErrors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
+                      {validationErrors.email && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+                      )}
                     </div>
 
                     <div>
@@ -213,8 +337,13 @@ const ContactPage = () => {
                         value={formData.phone} 
                         onChange={handleChange}
                         placeholder="+254 (0) 20 5285048"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" 
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent ${
+                          validationErrors.phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
                       />
+                      {validationErrors.phone && (
+                        <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
+                      )}
                     </div>
                   </div>
 
@@ -224,8 +353,9 @@ const ContactPage = () => {
                       name="service" 
                       value={formData.service} 
                       onChange={handleChange}
-                      required 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent ${
+                        validationErrors.service ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     >
                       <option value="">Select a service</option>
                       <option value="General Inquiry">General Inquiry</option>
@@ -237,6 +367,9 @@ const ContactPage = () => {
                       <option value="Criminal Law">Criminal Law</option>
                       <option value="Other">Other</option>
                     </select>
+                    {validationErrors.service && (
+                      <p className="text-red-500 text-sm mt-1">{validationErrors.service}</p>
+                    )}
                   </div>
 
                   <div>
@@ -245,15 +378,19 @@ const ContactPage = () => {
                       name="message" 
                       value={formData.message} 
                       onChange={handleChange}
-                      rows={6} 
-                      required
+                      rows={6}
                       placeholder="Please describe your legal matter and how we can help you..."
                       maxLength={1000}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none ${
+                        validationErrors.message ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     ></textarea>
                     <div className="text-right text-sm text-gray-500 mt-1">
                       {formData.message.length}/1000 characters
                     </div>
+                    {validationErrors.message && (
+                      <p className="text-red-500 text-sm mt-1">{validationErrors.message}</p>
+                    )}
                   </div>
 
                   <button 
@@ -264,7 +401,7 @@ const ContactPage = () => {
                     {isSubmitting ? (
                       <>
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Sending...</span>
+                        <span>Processing...</span>
                       </>
                     ) : (
                       <>
@@ -307,4 +444,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default ContactPage
