@@ -150,16 +150,16 @@ const Hero = () => {
 
       {/* Hero Content */}
       <div className="relative z-10 w-full h-full flex flex-col px-4 sm:px-6 lg:px-8">
-        {/* Title at top */}
-        <div className="pt-24 md:pt-32 text-center animate-fade-in-up">
+        {/* Spacer to push content down */}
+        <div className="flex-1"></div>
+
+        {/* Title in middle-lower area */}
+        <div className="text-center animate-fade-in-up mb-12 md:mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
             {slides[currentSlide].title}
           </h1>
         </div>
-
-        {/* Spacer to push buttons to bottom */}
-        <div className="flex-1"></div>
 
         {/* Action Buttons at bottom */}
         <div className="pb-20 md:pb-24">
