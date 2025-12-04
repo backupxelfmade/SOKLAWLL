@@ -53,7 +53,7 @@ export interface ServiceFormatted {
 export const servicesApi = {
   async fetchAll(): Promise<ServiceFormatted[]> {
     const { data, error } = await supabase
-      .from('services')
+      .from('legal_services')
       .select('*')
       .eq('is_active', true)
       .order('display_order', { ascending: true });
@@ -138,7 +138,7 @@ export const servicesApi = {
 
   async fetchById(id: string): Promise<ServiceFormatted | null> {
     const { data, error } = await supabase
-      .from('services')
+      .from('legal_services')
       .select('*')
       .eq('id', id)
       .eq('is_active', true)
@@ -154,7 +154,7 @@ export const servicesApi = {
 
   async create(service: Omit<Service, 'created_at' | 'updated_at'>): Promise<Service> {
     const { data, error } = await supabase
-      .from('services')
+      .from('legal_services')
       .insert([service])
       .select()
       .single();
@@ -169,7 +169,7 @@ export const servicesApi = {
 
   async update(id: string, updates: Partial<Service>): Promise<Service> {
     const { data, error } = await supabase
-      .from('services')
+      .from('legal_services')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -185,7 +185,7 @@ export const servicesApi = {
 
   async delete(id: string): Promise<void> {
     const { error } = await supabase
-      .from('services')
+      .from('legal_services')
       .delete()
       .eq('id', id);
 
@@ -203,7 +203,7 @@ export const servicesApi = {
         {
           event: '*',
           schema: 'public',
-          table: 'services',
+          table: 'legal_services',
         },
         callback
       )
