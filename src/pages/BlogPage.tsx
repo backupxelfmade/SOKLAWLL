@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, User, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Calendar, User, ArrowRight, ArrowLeft } from 'lucide-react';
 import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
 import Footer from '../components/Footer';
 
 const BlogPage: React.FC = () => {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,6 +89,16 @@ const BlogPage: React.FC = () => {
     <>
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors duration-200 group"
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Back</span>
+          </button>
+        </div>
+
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-slate-900 mb-4">Blog</h1>
           <p className="text-xl text-slate-600 max-w-2xl mx-auto">
