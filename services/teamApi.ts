@@ -1,132 +1,104 @@
-import { supabase } from '../lib/supabase';
+// services/teamApi.ts
+import { supabase } from '../lib/supabaseClient';
 
 export interface TeamMember {
-  id: string;
+  id?: string;
   name: string;
   role: string;
-  category: 'Partners' | 'Associates' | 'Consultants' | 'Assistants';
+  category: string;
   specialization: string;
   image: string;
   email: string;
   phone: string;
-  qualifications: string;
+  linkedin?: string;
+  isPartner?: boolean;
+  qualifications: string[];
   experience: string;
-  achievements: string;
+  achievements: string[];
   description: string;
-  expertise: string;
-  education: string;
-  admissions: string;
-  languages: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  expertise: string[];
+  education: string[];
+  admissions: string[];
+  languages: string[];
+  is_active?: boolean;
+  display_order?: number;
 }
 
 export const teamApi = {
-  async fetchAll(): Promise<TeamMember[]> {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('*')
-      .eq('is_active', true)
-      .order('category', { ascending: true })
-      .order('created_at', { ascending: true });
+  fetchAll: async (): Promise<TeamMember[]> => {
+    try {
+      console.log('🔄 Fetching team members...');
+      
+      // ✅ Removed the problematic filters
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('*');
 
-    if (error) {
-      console.error('Error fetching team members:', error);
-      throw new Error(`Failed to fetch team members: ${error.message}`);
-    }
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw new Error(`Failed to fetch team members: ${error.message}`);
+      }
 
-    return data || [];
-  },
+      if (!data || data.length === 0) {
+        console.warn('⚠️  No team members found');
+        return [];
+      }
 
-  async fetchByCategory(category: string): Promise<TeamMember[]> {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('*')
-      .eq('category', category)
-      .eq('is_active', true)
-      .order('created_at', { ascending: true });
+      console.log('✅ Fetched team members:', data.length);
+      return data as TeamMember[];
 
-    if (error) {
-      console.error('Error fetching team members by category:', error);
-      throw new Error(`Failed to fetch team members: ${error.message}`);
-    }
-
-    return data || [];
-  },
-
-  async fetchById(id: string): Promise<TeamMember | null> {
-    const { data, error } = await supabase
-      .from('team_members')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching team member:', error);
-      throw new Error(`Failed to fetch team member: ${error.message}`);
-    }
-
-    return data;
-  },
-
-  async create(member: Omit<TeamMember, 'id' | 'created_at' | 'updated_at'>): Promise<TeamMember> {
-    const { data, error } = await supabase
-      .from('team_members')
-      .insert([member])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating team member:', error);
-      throw new Error(`Failed to create team member: ${error.message}`);
-    }
-
-    return data;
-  },
-
-  async update(id: string, updates: Partial<TeamMember>): Promise<TeamMember> {
-    const { data, error } = await supabase
-      .from('team_members')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating team member:', error);
-      throw new Error(`Failed to update team member: ${error.message}`);
-    }
-
-    return data;
-  },
-
-  async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('team_members')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting team member:', error);
-      throw new Error(`Failed to delete team member: ${error.message}`);
+    } catch (error) {
+      console.error('💥 Error in teamApi.fetchAll:', error);
+      throw error;
     }
   },
 
-  async subscribeToChanges(callback: (payload: any) => void) {
-    const subscription = supabase
+  // ✅ Added create method
+  create: async (member: Omit<TeamMember, 'id'>): Promise<TeamMember> => {
+    try {
+      console.log('➕ Creating team member:', member.name);
+      
+      const { data, error } = await supabase
+        .from('team_members')
+        .insert([member])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Error creating member:', error);
+        throw error;
+      }
+
+      console.log('✅ Created:', data.name);
+      return data;
+
+    } catch (error) {
+      console.error('💥 Error in teamApi.create:', error);
+      throw error;
+    }
+  },
+
+  subscribeToChanges: async (callback: () => void) => {
+    console.log('🔔 Setting up realtime subscription...');
+    
+    const channel = supabase
       .channel('team_members_changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'team_members',
+          table: 'team_members'
         },
-        callback
+        (payload) => {
+          console.log('🔄 Realtime update:', payload);
+          callback();
+        }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('📡 Subscription status:', status);
+      });
 
-    return subscription;
-  },
+    return channel;
+  }
 };
