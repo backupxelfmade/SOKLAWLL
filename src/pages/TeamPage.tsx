@@ -4,24 +4,32 @@ import { ArrowLeft, Mail, Phone, Linkedin, Award, BookOpen, Scale } from 'lucide
 import Footer from '../components/Footer';
 import { teamMembers, TeamMember, getTeamByCategory as getTeamByCategoryStatic } from '../data/teamData';
 import { useTeamMembers } from '../hooks/useTeamMembers';
+import { useCategories } from '../hooks/useCategories';
 
 const TeamPage = () => {
   const navigate = useNavigate();
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
   const { members: dynamicMembers, loading, error } = useTeamMembers();
+  const { categories, loading: categoriesLoading } = useCategories();
 
-  const getTeamByCategory = (members: any[]) => {
-    return {
-      Partners: members.filter(m => m.category === 'Partners'),
-      'Consulting Partners': members.filter(m => m.category === 'Consulting Partners'),
-      Associates: members.filter(m => m.category === 'Associates'),
-      'Administrative staff': members.filter(m => m.category === 'Administrative staff'),
-      Assistants: members.filter(m => m.category === 'Assistants'),
-    };
+  const getTeamByCategory = (members: any[], categoryList: any[]) => {
+    const result: { [key: string]: any[] } = {};
+    categoryList.forEach(cat => {
+      result[cat.name] = members.filter(m => m.category === cat.name);
+    });
+    return result;
   };
 
   const membersToDisplay = dynamicMembers.length > 0 ? dynamicMembers : teamMembers;
-  const teamByCategory = getTeamByCategory(membersToDisplay);
+  const teamByCategory = categories.length > 0
+    ? getTeamByCategory(membersToDisplay, categories)
+    : {
+        Partners: membersToDisplay.filter(m => m.category === 'Partners'),
+        'Consulting Partners': membersToDisplay.filter(m => m.category === 'Consulting Partners'),
+        Associates: membersToDisplay.filter(m => m.category === 'Associates'),
+        'Administrative staff': membersToDisplay.filter(m => m.category === 'Administrative staff'),
+        Assistants: membersToDisplay.filter(m => m.category === 'Assistants'),
+      };
 
   // Handle back navigation using browser history
   const handleBackToHome = () => {
@@ -67,7 +75,7 @@ const TeamPage = () => {
             </div>
           )}
 
-          {loading ? (
+          {loading || categoriesLoading ? (
             <div className="text-center py-12">
               <p className="text-gray-600">Loading team members...</p>
             </div>

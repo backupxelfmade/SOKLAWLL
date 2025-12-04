@@ -3,26 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import { Linkedin, Mail, Phone, Users, Award, MapPin } from 'lucide-react';
 import { partners, getTeamByCategory } from '../data/teamData';
 import { useTeamMembers } from '../hooks/useTeamMembers';
+import { useCategories } from '../hooks/useCategories';
 
 const Team = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
   const { members: dynamicMembers, loading, error } = useTeamMembers();
+  const { categories, loading: categoriesLoading } = useCategories();
 
-  const getTeamByCategory = (members: any[]) => {
-    return {
-      Partners: members.filter(m => m.category === 'Partners'),
-      ConsultingPartners: members.filter(m => m.category === 'Consulting Partners'),
-      Associates: members.filter(m => m.category === 'Associates'),
-      Administrativestaff: members.filter(m => m.category === 'Administrative staff'),
-      Assistants: members.filter(m => m.category === 'Assistants'),
-    };
+  const getTeamByCategory = (members: any[], categoryList: any[]) => {
+    const result: { [key: string]: any[] } = {};
+    categoryList.forEach(cat => {
+      result[cat.name] = members.filter(m => m.category === cat.name);
+    });
+    return result;
   };
 
   const membersToDisplay = dynamicMembers.length > 0 ? dynamicMembers : partners;
-  const teamByCategory = getTeamByCategory(membersToDisplay);
-  const displayPartners = teamByCategory.Partners.slice(0, 3);
+  const teamByCategory = categories.length > 0
+    ? getTeamByCategory(membersToDisplay, categories)
+    : {
+        Partners: membersToDisplay.filter(m => m.category === 'Partners'),
+        'Consulting Partners': membersToDisplay.filter(m => m.category === 'Consulting Partners'),
+        Associates: membersToDisplay.filter(m => m.category === 'Associates'),
+        'Administrative staff': membersToDisplay.filter(m => m.category === 'Administrative staff'),
+        Assistants: membersToDisplay.filter(m => m.category === 'Assistants'),
+      };
+  const displayPartners = (teamByCategory['Partners'] || []).slice(0, 3);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
