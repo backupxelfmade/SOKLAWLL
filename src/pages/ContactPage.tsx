@@ -110,7 +110,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                    <a href="mailto:info@soklaw.co.ke" className="text-[#bfa06f] hover:underline text-sm">
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=info@soklaw.co.ke" target="_blank" rel="noopener noreferrer" className="text-[#bfa06f] hover:underline text-sm">
                       info@soklaw.co.ke
                     </a>
                   </div>
