@@ -40,7 +40,7 @@ export const categoriesApi = {
     return data;
   },
 
-  subscribeToChanges(callback: () => void) {
+  async subscribeToChanges(callback: () => void) {
     const subscription = supabase
       .channel('team_categories_changes')
       .on(
