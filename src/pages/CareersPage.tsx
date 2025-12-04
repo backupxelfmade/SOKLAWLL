@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, MapPin, Clock, GraduationCap, Heart, Users, TrendingUp, Award, X } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { getActiveJobPositions, JobPosition } from '../services/jobsApi';
 

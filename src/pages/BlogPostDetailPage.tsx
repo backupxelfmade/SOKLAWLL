@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { getBlogPostBySlug, BlogPost } from '../services/caisyApi';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const BlogPostDetailPage: React.FC = () => {
@@ -52,7 +51,6 @@ const BlogPostDetailPage: React.FC = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse">
@@ -79,7 +77,6 @@ const BlogPostDetailPage: React.FC = () => {
   if (error || !post) {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
@@ -101,7 +98,6 @@ const BlogPostDetailPage: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-24 pb-16">
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link

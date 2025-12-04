@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const BlogPage: React.FC = () => {

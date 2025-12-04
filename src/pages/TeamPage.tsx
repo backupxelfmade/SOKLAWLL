@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, Linkedin, Award, BookOpen, Scale } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { teamMembers, TeamMember, getTeamByCategory as getTeamByCategoryStatic } from '../data/teamData';
 import { useTeamMembers } from '../hooks/useTeamMembers';
