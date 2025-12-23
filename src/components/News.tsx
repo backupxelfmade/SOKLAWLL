@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowRight, AlertCircle } from 'lucide-react';
 import NewsLoader from './NewsLoader';
-import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
+import { getAllBlogPosts, BlogPost } from '../services/bloggerApi';
 
 const News = () => {
   const sectionRef = useRef<HTMLElement>(null);
