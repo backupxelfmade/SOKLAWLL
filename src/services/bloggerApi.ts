@@ -31,20 +31,26 @@ interface BloggerApiResponse {
   items?: BloggerPost[];
 }
 
-const BLOGGER_API_KEY = import.meta.env.VITE_BLOGGER_API_KEY || '';
-const BLOGGER_BLOG_ID = import.meta.env.VITE_BLOGGER_BLOG_ID || '';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 const fetchFromBlogger = async (endpoint: string): Promise<BloggerApiResponse> => {
-  if (!BLOGGER_API_KEY || !BLOGGER_BLOG_ID) {
-    throw new Error('Blogger API key or Blog ID is not configured');
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error('Supabase configuration is missing');
   }
 
   try {
-    const url = `https://www.googleapis.com/blogger/v3/blogs/${BLOGGER_BLOG_ID}/${endpoint}?key=${BLOGGER_API_KEY}`;
-    const response = await fetch(url);
+    const url = `${SUPABASE_URL}/functions/v1/fetch-blog-posts?endpoint=${encodeURIComponent(endpoint)}`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      }
+    });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API request failed: ${response.status} ${errorData.error || response.statusText}`);
     }
 
     const result = await response.json();
