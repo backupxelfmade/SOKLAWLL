@@ -99,7 +99,7 @@ const Hero = () => {
                   'linear-gradient(135deg,#bfa06f 0%,#8b7355 100%)';
             }}
           />
-          {/* Directional overlay — heavier on bottom-left for text legibility */}
+          {/* Directional overlay — heavier bottom-left for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/50 to-black/20" />
         </div>
       ))}
@@ -154,10 +154,10 @@ const Hero = () => {
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            {/* Secondary — text-only style, modern & uncluttered */}
+            {/* Secondary — bordered */}
             <button
               onClick={() => scrollTo('#services')}
-              className="group flex items-center justify-center sm:justify-start gap-2 text-white/90 hover:text-white font-medium text-sm sm:text-base transition-colors duration-200 py-3 sm:py-0 px-2"
+              className="group flex items-center justify-center sm:justify-start gap-2 border border-white/40 hover:border-white/70 hover:bg-white/10 text-white/90 hover:text-white font-medium text-sm sm:text-base px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-200"
             >
               <span>Practice Areas</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -166,8 +166,8 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ── Slide indicators — bottom right on desktop, centered on mobile ── */}
-      <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-8 lg:bottom-8 lg:right-16 z-30 flex items-center gap-1.5 left-1/2 -translate-x-1/2 justify-center sm:left-auto sm:translate-x-0 sm:justify-end">
+      {/* ── Slide indicators — centered mobile, bottom-right desktop ── */}
+      <div className="absolute bottom-5 z-30 flex items-center gap-1.5 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-8 lg:right-16 sm:bottom-6 lg:bottom-8">
         {slides.map((_, i) => (
           <button
             key={i}
