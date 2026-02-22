@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, User, ArrowRight, AlertCircle } from 'lucide-react';
+import { Calendar, User, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import NewsLoader from './NewsLoader';
 import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
 
@@ -11,28 +11,20 @@ const News = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Animate cards when visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const cards = entry.target.querySelectorAll('.news-card');
-            cards.forEach((card, index) => {
-              setTimeout(() => {
-                card.classList.add('animate-fade-in-up');
-              }, index * 100);
+            entry.target.querySelectorAll('.news-card').forEach((card, i) => {
+              setTimeout(() => card.classList.add('animate-fade-in-up'), i * 100);
             });
           }
         });
       },
       { threshold: 0.1 }
     );
-    
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-    
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -43,166 +35,214 @@ const News = () => {
         setError(null);
         const data = await getAllBlogPosts();
         setPosts(data.slice(0, 6));
-      } catch (error) {
-        console.error("Error fetching blog posts:", error);
-        setError("Unable to load blog posts at the moment. Please try again later.");
+      } catch (err) {
+        console.error('Error fetching blog posts:', err);
+        setError('Unable to load blog posts at the moment. Please try again later.');
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchPosts();
   }, []);
 
-  const handleArticleClick = (post: BlogPost) => {
-    navigate(`/blog/${post.slug}`);
-  };
+  const handleArticleClick = (post: BlogPost) => navigate(`/blog/${post.slug}`);
 
   const handleViewAllClick = () => {
     navigate('/blog');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      month: 'short',
+      day: 'numeric',
     });
-  };
-
-  const handleRetry = () => {
-    setError(null);
-    window.location.reload();
-  };
 
   return (
-    <section ref={sectionRef} id="news" className="py-16 md:py-20 lg:py-24" style={{ backgroundColor: '#f5f5f0' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-blue-900">
-            Latest Blog Posts
-          </h2>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-600 leading-relaxed">
-            Stay updated with our latest legal insights, case victories, and important legal developments
-          </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-yellow-500 to-yellow-400 mx-auto mt-4 md:mt-6"></div>
+    <section ref={sectionRef} id="news" className="py-10 sm:py-20 lg:py-28 bg-white">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
+
+        {/* ── Section header ── */}
+        <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
+              <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                Insights & Updates
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
+              Latest Blog Posts
+            </h2>
+          </div>
+
+          {/* Desktop "View All" */}
+          {!isLoading && !error && posts.length > 0 && (
+            <button
+              onClick={handleViewAllClick}
+              className="hidden sm:flex items-center gap-2 self-end text-sm font-semibold text-[#bfa06f] hover:text-[#a08a5f] transition-colors duration-200 group pb-1 border-b border-[#bfa06f]/40 hover:border-[#a08a5f] whitespace-nowrap"
+            >
+              <span>View All Posts</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          )}
         </div>
 
+        {/* Subheading — desktop only */}
+        <p className="hidden sm:block text-base text-[#4a4a4a] max-w-2xl mb-10 leading-relaxed">
+          Stay updated with our latest legal insights, case victories, and important
+          legal developments affecting individuals and businesses in Kenya.
+        </p>
+
+        {/* ── Loading ── */}
         {isLoading && (
-          <NewsLoader
-            message="Loading latest blog posts..."
-            variant="cards"
-          />
+          <NewsLoader message="Loading latest blog posts..." variant="cards" />
         )}
 
+        {/* ── Error ── */}
         {error && !isLoading && (
-          <div className="text-center py-12">
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6 md:p-8 max-w-md mx-auto">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Unable to Load Posts</h3>
-              <p className="text-red-600 mb-6 text-sm md:text-base">{error}</p>
+          <div className="py-10 flex justify-center">
+            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center">
+              <div className="flex items-center justify-center w-11 h-11 rounded-full bg-red-100 mx-auto mb-4">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+              </div>
+              <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">Unable to Load Posts</h3>
+              <p className="text-xs text-[#6a6a6a] mb-5 leading-relaxed">{error}</p>
               <button
-                onClick={handleRetry}
-                className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
+                onClick={() => { setError(null); window.location.reload(); }}
+                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-xs font-semibold px-5 py-2.5 rounded-full transition-colors duration-200 mx-auto"
               >
-                Try Again
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Try Again</span>
               </button>
             </div>
           </div>
         )}
 
+        {/* ── Empty ── */}
         {!isLoading && !error && posts.length === 0 && (
-          <div className="text-center py-12">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 md:p-8 max-w-md mx-auto">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">No Posts Available</h3>
-              <p className="text-gray-600">Check back later for new content.</p>
+          <div className="py-10 flex justify-center">
+            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center">
+              <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">No Posts Yet</h3>
+              <p className="text-xs text-[#6a6a6a]">Check back later for new content.</p>
             </div>
           </div>
         )}
 
+        {/* ── Posts grid ── */}
         {!isLoading && !error && posts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {posts.map((post) => (
-              <article
-                key={post.id}
-                className="news-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-2 hover:shadow-xl opacity-0 group"
-                onClick={() => handleArticleClick(post)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleArticleClick(post);
-                  }
-                }}
-                aria-label={`Read article: ${post.title}`}
-              >
-                {post.featuredImage && (
-                  <div className="aspect-video overflow-hidden bg-gray-200">
-                    <img
-                      src={post.featuredImage.src}
-                      alt={post.featuredImage.title || post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-blue-900 mb-3 line-clamp-2 group-hover:text-yellow-600 transition-colors">
-                    {post.title}
-                  </h3>
-
-                  <p className="text-gray-600 mb-4 line-clamp-3 text-sm md:text-base leading-relaxed">
-                    {post.excerpt}
-                  </p>
-
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <div className="flex items-center space-x-4">
-                      {post.publishedDate && (
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>{formatDate(post.publishedDate)}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center space-x-1 text-yellow-600 group-hover:text-yellow-700 font-medium">
-                      <span>Read More</span>
-                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-
-                  {post.author && (
-                    <div className="flex items-center mt-4 pt-4 border-t border-gray-100">
-                      <User className="h-4 w-4 text-gray-400 mr-2" />
-                      <span className="text-sm text-gray-600">
-                        {post.author}
-                      </span>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
+              {posts.map((post) => (
+                <article
+                  key={post.id}
+                  className="news-card opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  onClick={() => handleArticleClick(post)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleArticleClick(post);
+                    }
+                  }}
+                  aria-label={`Read article: ${post.title}`}
+                >
+                  {/* Featured image */}
+                  {post.featuredImage && (
+                    <div className="aspect-video overflow-hidden bg-[#e8e0d0]">
+                      <img
+                        src={post.featuredImage.src}
+                        alt={post.featuredImage.title || post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
                     </div>
                   )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
 
-        {!isLoading && !error && posts.length > 0 && (
-          <div className="text-center mt-12">
-            <button
-              onClick={handleViewAllClick}
-              className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-semibold hover:from-yellow-700 hover:to-yellow-600 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg text-sm md:text-base"
-              type="button"
-              aria-label="View all blog posts"
-            >
-              <span>View All Posts</span>
-              <ArrowRight className="h-4 w-4 md:h-5 md:w-5" />
-            </button>
-          </div>
+                  {/* Card body */}
+                  <div className="p-3.5 sm:p-5">
+                    {/* Gold rule */}
+                    <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-2 sm:mb-3 transition-all duration-300 group-hover:w-6 sm:group-hover:w-8" />
+
+                    {/* Title */}
+                    <h3 className="font-bold text-[#1a1a1a] leading-snug line-clamp-2 mb-1.5 sm:mb-2
+                      text-sm sm:text-base lg:text-lg group-hover:text-[#bfa06f] transition-colors duration-200">
+                      {post.title}
+                    </h3>
+
+                    {/* Excerpt — desktop only */}
+                    <p className="hidden sm:block text-[#6a6a6a] text-sm leading-relaxed line-clamp-3 mb-4">
+                      {post.excerpt}
+                    </p>
+
+                    {/* Meta row */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {post.publishedDate && (
+                          <div className="flex items-center gap-1 text-[#6a6a6a]">
+                            <Calendar className="h-3 w-3 flex-shrink-0" />
+                            <span className="text-[0.6rem] sm:text-xs truncate">
+                              {formatDate(post.publishedDate)}
+                            </span>
+                          </div>
+                        )}
+                        {post.author && (
+                          <div className="hidden sm:flex items-center gap-1 text-[#6a6a6a]">
+                            <User className="h-3 w-3 flex-shrink-0" />
+                            <span className="text-xs truncate">{post.author}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Read more */}
+                      <div className="flex items-center gap-1 text-[#bfa06f] font-semibold flex-shrink-0
+                        text-[0.6rem] sm:text-xs group-hover:gap-1.5 transition-all duration-200">
+                        <span>Read</span>
+                        <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Mobile "View All" */}
+            <div className="mt-6 flex justify-center sm:hidden">
+              <button
+                onClick={handleViewAllClick}
+                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-md transition-all duration-200 group w-full max-w-xs"
+              >
+                <span>View All Posts</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+          </>
         )}
       </div>
+
+      <style>{`
+        .animate-fade-in-up {
+          animation: fadeInUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </section>
   );
 };
