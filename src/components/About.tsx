@@ -139,7 +139,7 @@ const About = () => {
                 Excellence in Legal Practice Since 2009
               </h3>
               <p className="text-[#4a4a4a] leading-relaxed text-xs sm:text-base">
-                SOK Law Associates has been at the forefront of legal practice in Kenya,
+                SOKLaw Advocates has been at the forefront of legal practice in Kenya,
                 providing comprehensive legal solutions to individuals, corporations, and
                 institutions. Our commitment to excellence, integrity, and client
                 satisfaction has made us one of the most trusted law firms in the region.
