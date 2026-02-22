@@ -47,7 +47,7 @@ const WhyChooseUs = () => {
         {/* ── Bento grid ── */}
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 lg:gap-4">
 
-          {/* ── Card 1 — Large feature, image bg ── */}
+          {/* ── Card 1 — Large feature image ── */}
           <div className="bento-card opacity-0 col-span-2 lg:col-span-5 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl min-h-[180px] sm:min-h-[320px] group cursor-default">
             <img
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
@@ -131,54 +131,36 @@ const WhyChooseUs = () => {
             </div>
           </div>
 
-          {/* ── Card 5 — Personalised ── */}
-          <div className="bento-card opacity-0 col-span-2 lg:col-span-4 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
+          {/* ── Card 5 — Personalised — spans full remaining row 2 width ── */}
+          <div className="bento-card opacity-0 col-span-2 lg:col-span-7 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
             <div className="flex items-start justify-between mb-3 sm:mb-5">
               <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
                 Our Approach
               </span>
               <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]/40 group-hover:text-[#bfa06f] transition-colors" />
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-6">
               <div>
                 <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300 group-hover:w-7 sm:group-hover:w-9" />
                 <h3 className="text-[#1a1a1a] font-bold leading-tight
-                  text-xs sm:text-lg lg:text-xl">
+                  text-xs sm:text-xl lg:text-2xl">
                   Personalised Legal Strategy
                 </h3>
                 <p className="text-[#6a6a6a] leading-relaxed mt-1 sm:mt-2 hidden sm:block
-                  text-[0.55rem] sm:text-sm">
+                  sm:text-sm lg:text-base max-w-lg">
                   Every mandate handled with a bespoke strategy built around your
-                  specific circumstances, goals, and risk profile.
+                  specific circumstances, goals, and risk profile — no cookie-cutter
+                  solutions, only counsel that fits.
                 </p>
               </div>
               <div className="text-right flex-shrink-0">
-                <div className="text-2xl sm:text-4xl font-black text-[#1a1a1a] leading-none">
+                <div className="text-2xl sm:text-5xl lg:text-6xl font-black text-[#1a1a1a] leading-none">
                   1:1
                 </div>
                 <div className="text-[0.55rem] sm:text-xs text-[#6a6a6a] font-medium mt-0.5">
                   Dedicated counsel
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* ── Card 6 — Availability ── */}
-          <div className="bento-card opacity-0 col-span-1 lg:col-span-3 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-6 flex flex-col justify-between group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
-            <div className="flex items-start justify-between">
-              <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
-                Availability
-              </span>
-              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]/40 group-hover:text-[#bfa06f] transition-colors" />
-            </div>
-            <div>
-              <div className="font-black text-[#1a1a1a] leading-none mb-0.5 sm:mb-1
-                text-3xl sm:text-5xl lg:text-6xl">
-                24<span className="text-[#bfa06f]">/</span>7
-              </div>
-              <p className="text-[#6a6a6a] font-medium text-[0.6rem] sm:text-sm">
-                Client support
-              </p>
             </div>
           </div>
 
