@@ -67,7 +67,7 @@ const Services = () => {
           </button>
         </div>
 
-        {/* Subheading — desktop only, tight margin */}
+        {/* Subheading — desktop only */}
         <p className="hidden sm:block text-base text-[#4a4a4a] max-w-2xl mb-8 leading-relaxed">
           Comprehensive legal solutions across a broad range of practice areas—expert
           representation tailored to your needs.
@@ -88,7 +88,8 @@ const Services = () => {
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-xl sm:rounded-2xl bg-[#f9f7f1] animate-pulse h-[160px] sm:h-[300px] lg:h-[380px]"
+                className="rounded-xl sm:rounded-2xl bg-[#f9f7f1] animate-pulse"
+                style={{ height: 'clamp(160px, 25vw, 480px)' }}
               />
             ))}
           </div>
@@ -98,7 +99,8 @@ const Services = () => {
               <div
                 key={service.id || i}
                 onClick={() => handleServiceClick(service)}
-                className="service-card opacity-0 relative group overflow-hidden cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl h-[160px] sm:h-[300px] lg:h-[380px]"
+                className="service-card opacity-0 relative group overflow-hidden cursor-pointer transition-all duration-300 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl"
+                style={{ height: 'clamp(160px, 25vw, 480px)' }}
               >
                 {/* Background image */}
                 <div
@@ -108,7 +110,7 @@ const Services = () => {
                   }}
                 />
 
-                {/* Stronger gradient for readable text */}
+                {/* Strong gradient overlay for legibility */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10 group-hover:from-black/95 transition-all duration-300" />
 
                 {/* Arrow chip */}
@@ -121,17 +123,23 @@ const Services = () => {
                 {/* Bottom content */}
                 <div className="absolute bottom-0 inset-x-0 z-10 p-3 sm:p-5 lg:p-6">
                   <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300 group-hover:w-7 sm:group-hover:w-9" />
-                  <h3 className="text-xs sm:text-base lg:text-lg font-bold text-white leading-snug line-clamp-2">
+                  <h3
+                    className="text-xs sm:text-base lg:text-xl font-bold leading-snug line-clamp-2"
+                    style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
+                  >
                     {service.title}
                   </h3>
                   {/* "Learn more" — desktop hover reveal */}
-                  <div className="hidden sm:flex items-center gap-1.5 mt-2.5 text-[#bfa06f] text-xs font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+                  <div
+                    className="hidden sm:flex items-center gap-1.5 mt-2.5 text-xs font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200"
+                    style={{ color: '#bfa06f' }}
+                  >
                     <span>Learn more</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
                 </div>
 
-                {/* Border on hover */}
+                {/* Gold border on hover */}
                 <div className="absolute inset-0 rounded-xl sm:rounded-2xl border border-transparent group-hover:border-[#bfa06f]/30 transition-all duration-300 pointer-events-none" />
               </div>
             ))}
