@@ -7,19 +7,19 @@ const slides = [
     image:          'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
     position:       'center 30%',
     mobilePosition: 'center 20%',
-    alt:            'SOK Law Associates senior advocates in Nairobi office',
+    alt:            'SOKLaw Advocates senior advocates in Nairobi office',
   },
   {
     image:          'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
     position:       'center 30%',
     mobilePosition: 'center 15%',
-    alt:            'SOK Law Associates legal team consultation session Nairobi',
+    alt:            'SOKLaw Advocates legal team consultation session Nairobi',
   },
   {
     image:          'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
     position:       'center 50%',
     mobilePosition: 'center 30%',
-    alt:            'SOK Law Associates advocates serving clients in Kenya',
+    alt:            'SOKLaw Advocates advocates serving clients in Kenya',
   },
 ];
 
@@ -32,7 +32,7 @@ const trustBadges = [
 const schemaMarkup = {
   '@context': 'https://schema.org',
   '@type': 'LegalService',
-  name: 'SOK Law Associates',
+  name: 'SOKLaw Advocates',
   alternateName: 'Simiyu, Opondo, Kiranga & Advocates',
   description: 'Leading Nairobi law firm providing expert legal representation in litigation, corporate law, real estate, family law, and 14 other practice areas since 2009.',
   url: 'https://soklaw.co.ke',
