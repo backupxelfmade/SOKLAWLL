@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Clock, Share2, BookOpen } from 'lucide-react';
+import {
+  ArrowLeft, ArrowRight, Calendar, User, Clock,
+  Share2, BookOpen, Loader2, AlertCircle,
+} from 'lucide-react';
 import Footer from '../components/Footer';
 import NewsLoader from '../components/NewsLoader';
 
@@ -13,15 +16,8 @@ interface Post {
   published_at: string;
   html: string;
   reading_time?: number;
-  authors?: Array<{
-    name: string;
-    profile_image?: string;
-    bio?: string;
-  }>;
-  tags?: Array<{
-    name: string;
-    slug: string;
-  }>;
+  authors?: Array<{ name: string; profile_image?: string; bio?: string }>;
+  tags?: Array<{ name: string; slug: string }>;
 }
 
 const BlogPostPage = () => {
@@ -30,115 +26,65 @@ const BlogPostPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [post, setPost] = useState<Post | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  // Handle back navigation
-  const handleBackToNews = () => {
-    navigate(-1);
-  };
-
-  // Fetch individual post from Ghost CMS
   useEffect(() => {
     const fetchPost = async () => {
-      if (!postId) {
-        setError('No post ID provided');
-        setLoading(false);
-        return;
-      }
-
+      if (!postId) { setError('No post ID provided'); setLoading(false); return; }
       try {
         setLoading(true);
         setError(null);
-        
-        const ghostApiUrl = 'https://soklaw-blogs.ghost.io/ghost/api/v3/content/posts/slug';
-        const apiKey = '0843bfcc306e6a0363a715e082';
         const params = new URLSearchParams({
-          key: apiKey,
+          key: '0843bfcc306e6a0363a715e082',
           include: 'tags,authors',
-          formats: 'html'
+          formats: 'html',
         });
-
-        const response = await fetch(`${ghostApiUrl}/${postId}/?${params}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          mode: 'cors',
-        });
-        
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Article not found');
-          }
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (data.posts && data.posts.length > 0) {
+        const res = await fetch(
+          `https://soklaw-blogs.ghost.io/ghost/api/v3/content/posts/slug/${postId}/?${params}`,
+          { headers: { Accept: 'application/json' }, mode: 'cors' }
+        );
+        if (!res.ok) throw new Error(res.status === 404 ? 'Article not found' : `HTTP ${res.status}`);
+        const data = await res.json();
+        if (data.posts?.length > 0) {
           setPost(data.posts[0]);
-          
-          // Update page title and meta description
-          document.title = `${data.posts[0].title} - SOK Law Associates`;
-          const metaDescription = document.querySelector('meta[name="description"]');
-          if (metaDescription) {
-            metaDescription.setAttribute('content', data.posts[0].excerpt || 'Read our latest legal insights and updates.');
-          }
-        } else {
-          throw new Error('Post not found');
-        }
-        
-      } catch (error) {
-        console.error("Error fetching Ghost post:", error);
-        setError(error instanceof Error ? error.message : 'Unable to load the article. Please try again later.');
+          document.title = `${data.posts[0].title} — SOK Law Associates`;
+          document.querySelector('meta[name="description"]')
+            ?.setAttribute('content', data.posts[0].excerpt || 'Legal insights from SOK Law.');
+        } else throw new Error('Post not found');
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Unable to load article. Please try again.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchPost();
-    
-    // Cleanup function to reset page title
-    return () => {
-      document.title = 'SOK Law Associates';
-    };
+    return () => { document.title = 'SOK Law Associates'; };
   }, [postId]);
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  // Share functionality
   const handleShare = async () => {
     if (navigator.share && post) {
-      try {
-        await navigator.share({
-          title: post.title,
-          text: post.excerpt,
-          url: window.location.href,
-        });
-      } catch (error) {
-        console.log('Error sharing:', error);
-      }
+      try { await navigator.share({ title: post.title, text: post.excerpt, url: window.location.href }); }
+      catch {}
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      // You could show a toast notification here
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
+  /* ── Loading ── */
   if (loading) {
     return (
       <>
-        <Navbar />
-        <div className="pt-20 min-h-screen bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <NewsLoader message="Loading article..." showIcon={false} />
+        <div className="min-h-screen bg-white flex items-center justify-center pt-20">
+          <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#bfa06f]/10">
+              <Loader2 className="h-4 w-4 text-[#bfa06f] animate-spin" />
+            </div>
+            <p className="text-xs text-[#6a6a6a]">Loading article…</p>
           </div>
         </div>
         <Footer />
@@ -146,21 +92,26 @@ const BlogPostPage = () => {
     );
   }
 
+  /* ── Error ── */
   if (error || !post) {
     return (
       <>
-        <Navbar />
-        <div className="pt-20 min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-4">
-            <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Article Not Found</h1>
-            <p className="text-gray-600 mb-6">{error || 'The article you\'re looking for doesn\'t exist.'}</p>
+        <div className="min-h-screen bg-white flex items-center justify-center pt-20 px-4">
+          <div className="text-center max-w-sm">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#bfa06f]/10 mx-auto mb-4">
+              <BookOpen className="h-5 w-5 text-[#bfa06f]" />
+            </div>
+            <div className="w-4 h-0.5 bg-[#bfa06f] mx-auto mb-3" />
+            <h1 className="text-base sm:text-xl font-bold text-[#0d2340] mb-2">Article Not Found</h1>
+            <p className="text-xs sm:text-sm text-[#6a6a6a] mb-6 leading-relaxed">
+              {error || "The article you're looking for doesn't exist or has been removed."}
+            </p>
             <button
-              onClick={handleBackToNews}
-              className="inline-flex items-center space-x-2 bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition-colors font-medium"
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-1.5 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
             >
-              <ArrowLeft className="h-5 w-5" />
-              <span>Back to News</span>
+              <ArrowLeft className="h-3 w-3" />
+              Back to News
             </button>
           </div>
         </div>
@@ -169,166 +120,180 @@ const BlogPostPage = () => {
     );
   }
 
+  /* ── Article ── */
   return (
     <>
-      <Navbar />
-      <div className="pt-20 min-h-screen bg-gray-50">
-        {/* Navigation */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
-            <button
-              onClick={handleBackToNews}
-              className="inline-flex items-center text-yellow-600 hover:text-yellow-700 mb-4 transition-colors font-medium group"
-            >
-              <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-              Back to News
-            </button>
-            
-            {/* Breadcrumb */}
-            <nav className="text-sm text-gray-500">
-              <button 
+      <div className="min-h-screen bg-white w-full overflow-x-hidden">
+
+        {/* ── Dark header band ── */}
+        <div className="bg-[#0d2340] pt-24 sm:pt-28 pb-8 sm:pb-12 relative overflow-hidden">
+          <div
+            className="hidden lg:block absolute right-0 top-0 bottom-0 w-[38%] opacity-[0.04]"
+            style={{ backgroundImage: 'repeating-linear-gradient(-55deg, #bfa06f 0px, #bfa06f 1px, transparent 1px, transparent 28px)' }}
+          />
+          <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
+
+            {/* Back + breadcrumb */}
+            <div className="flex items-center gap-1.5 mb-4 sm:mb-6">
+              <button
+                onClick={() => navigate(-1)}
+                className="group inline-flex items-center gap-1 text-white/50 hover:text-white text-[0.6rem] sm:text-xs font-semibold transition-colors"
+              >
+                <ArrowLeft className="h-2.5 w-2.5 group-hover:-translate-x-0.5 transition-transform" />
+                Back
+              </button>
+              <span className="text-white/20 text-[0.6rem]">/</span>
+              <button
                 onClick={() => navigate('/')}
-                className="hover:text-yellow-600 transition-colors"
+                className="text-white/40 hover:text-white/70 text-[0.6rem] sm:text-xs transition-colors"
               >
                 Home
               </button>
-              <span className="mx-2">/</span>
-              <button 
-                onClick={() => {
-                  navigate('/');
-                  setTimeout(() => {
-                    document.getElementById('news')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
-                className="hover:text-yellow-600 transition-colors"
-              >
-                News
-              </button>
-              <span className="mx-2">/</span>
-              <span className="text-gray-700 truncate">
+              <span className="text-white/20 text-[0.6rem]">/</span>
+              <span className="text-white/40 text-[0.6rem] sm:text-xs truncate max-w-[120px] sm:max-w-xs">
                 {post.title}
               </span>
-            </nav>
-          </div>
-        </div>
+            </div>
 
-        {/* Article Content */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-          <article className="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
-            {/* Featured Image */}
-            {post.feature_image && (
-              <div className="aspect-video md:aspect-[21/9] overflow-hidden">
-                <img
-                  src={post.feature_image}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
+            {/* Tags */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-3 sm:mb-4">
+                {post.tags.map((tag) => (
+                  <span
+                    key={tag.slug}
+                    className="text-[0.55rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f] bg-[#bfa06f]/10 border border-[#bfa06f]/20 rounded-full px-2 py-0.5"
+                  >
+                    {tag.name}
+                  </span>
+                ))}
               </div>
             )}
 
-            <div className="p-6 md:p-8 lg:p-12">
-              {/* Tags */}
-              {post.tags && post.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4 md:mb-6">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag.slug}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full"
-                    >
-                      {tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
+            {/* Title */}
+            <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight mb-3 sm:mb-5">
+              {post.title}
+            </h1>
 
-              {/* Article Header */}
-              <header className="mb-6 md:mb-8">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 text-gray-900 leading-tight">
-                  {post.title}
-                </h1>
-                
-                {post.excerpt && (
-                  <p className="text-lg md:text-xl text-gray-600 mb-6 leading-relaxed">
-                    {post.excerpt}
-                  </p>
-                )}
-
-                {/* Meta Information */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200">
-                  <div className="flex flex-wrap items-center gap-4 md:gap-6 text-sm text-gray-500">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatDate(post.published_at)}</span>
-                    </div>
-                    {post.reading_time && (
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4" />
-                        <span>{post.reading_time} min read</span>
-                      </div>
-                    )}
-                    {post.authors && post.authors.length > 0 && (
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
-                        <span>{post.authors[0].name}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Share Button */}
-                  <button
-                    onClick={handleShare}
-                    className="inline-flex items-center space-x-2 text-gray-500 hover:text-yellow-600 transition-colors"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    <span className="text-sm font-medium">Share</span>
-                  </button>
+            {/* Meta strip */}
+            <div className="flex items-center flex-wrap gap-2 sm:gap-4">
+              {[
+                { icon: Calendar, val: formatDate(post.published_at) },
+                post.reading_time ? { icon: Clock, val: `${post.reading_time} min read` } : null,
+                post.authors?.length ? { icon: User, val: post.authors[0].name } : null,
+              ].filter(Boolean).map(({ icon: Icon, val }: any) => (
+                <div key={val} className="flex items-center gap-1 sm:gap-1.5">
+                  <Icon className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[#bfa06f] flex-shrink-0" />
+                  <span className="text-[0.6rem] sm:text-xs text-white/50">{val}</span>
                 </div>
-              </header>
-              
-              {/* Article Content */}
-              <div 
-                className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-yellow-600 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-blockquote:border-yellow-500 prose-blockquote:text-gray-600 prose-img:rounded-lg prose-img:shadow-md"
-                dangerouslySetInnerHTML={{ __html: post.html }}
+              ))}
+
+              {/* Share */}
+              <button
+                onClick={handleShare}
+                className="ml-auto flex items-center gap-1 text-white/40 hover:text-[#bfa06f] transition-colors text-[0.6rem] sm:text-xs font-semibold"
+              >
+                <Share2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                {copied ? 'Copied!' : 'Share'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Feature image — bleeds below header ── */}
+        {post.feature_image && (
+          <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 -mt-0">
+            <div className="w-full aspect-video sm:aspect-[21/9] overflow-hidden rounded-xl sm:rounded-2xl border border-[#e8e0d0] shadow-sm">
+              <img
+                src={post.feature_image}
+                alt={post.title}
+                className="w-full h-full object-cover"
               />
+            </div>
+          </div>
+        )}
 
-              {/* Author Bio */}
-              {post.authors && post.authors.length > 0 && post.authors[0].bio && (
-                <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200">
-                  <div className="flex items-start space-x-4">
-                    {post.authors[0].profile_image && (
-                      <img
-                        src={post.authors[0].profile_image}
-                        alt={post.authors[0].name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                    )}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                        About {post.authors[0].name}
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed">
-                        {post.authors[0].bio}
-                      </p>
-                    </div>
+        {/* ── Article body ── */}
+        <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-12">
+
+          {/* Excerpt lede */}
+          {post.excerpt && (
+            <p className="text-sm sm:text-lg text-[#4a4a4a] leading-relaxed border-l-2 border-[#bfa06f] pl-3 sm:pl-4 mb-6 sm:mb-10 italic">
+              {post.excerpt}
+            </p>
+          )}
+
+          {/* Ghost HTML content */}
+          <div
+            className="
+              prose prose-sm sm:prose-base max-w-none
+              prose-headings:font-bold prose-headings:text-[#0d2340] prose-headings:leading-snug
+              prose-h2:text-lg sm:prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-3
+              prose-h3:text-base sm:prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
+              prose-p:text-[#4a4a4a] prose-p:leading-relaxed prose-p:text-[0.8rem] sm:prose-p:text-base
+              prose-a:text-[#bfa06f] prose-a:no-underline hover:prose-a:underline
+              prose-strong:text-[#0d2340]
+              prose-ul:text-[#4a4a4a] prose-ol:text-[#4a4a4a]
+              prose-li:text-[0.8rem] sm:prose-li:text-base prose-li:leading-relaxed
+              prose-blockquote:border-l-2 prose-blockquote:border-[#bfa06f] prose-blockquote:text-[#6a6a6a] prose-blockquote:not-italic prose-blockquote:pl-4
+              prose-img:rounded-xl prose-img:border prose-img:border-[#e8e0d0]
+              prose-hr:border-[#e8e0d0]
+              prose-code:text-[#bfa06f] prose-code:bg-[#f9f7f1] prose-code:rounded prose-code:px-1
+            "
+            dangerouslySetInnerHTML={{ __html: post.html }}
+          />
+
+          {/* ── Author bio ── */}
+          {post.authors?.[0]?.bio && (
+            <div className="mt-8 sm:mt-14 pt-5 sm:pt-8 border-t border-[#e8e0d0]">
+              <div className="flex items-start gap-3 sm:gap-4">
+                {post.authors[0].profile_image ? (
+                  <img
+                    src={post.authors[0].profile_image}
+                    alt={post.authors[0].name}
+                    className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl object-cover flex-shrink-0 border border-[#e8e0d0]"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-[#bfa06f]/10 flex-shrink-0">
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-[#bfa06f]" />
                   </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="block h-px w-3 bg-[#bfa06f]" />
+                    <span className="text-[0.55rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">Author</span>
+                  </div>
+                  <h3 className="text-[0.7rem] sm:text-sm font-bold text-[#0d2340] mb-1">
+                    {post.authors[0].name}
+                  </h3>
+                  <p className="text-[0.6rem] sm:text-xs text-[#6a6a6a] leading-relaxed">
+                    {post.authors[0].bio}
+                  </p>
                 </div>
-              )}
-
-              {/* Back to News Button */}
-              <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200 text-center">
-                <button
-                  onClick={handleBackToNews}
-                  className="inline-flex items-center space-x-2 bg-yellow-600 text-white px-6 py-3 rounded-lg hover:bg-yellow-700 transition-colors font-medium"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                  <span>Back to News</span>
-                </button>
               </div>
             </div>
-          </article>
+          )}
+
+          {/* ── Footer actions ── */}
+          <div className="mt-8 sm:mt-14 pt-5 sm:pt-8 border-t border-[#e8e0d0] flex items-center justify-between gap-3 flex-wrap">
+            <button
+              onClick={() => navigate(-1)}
+              className="group inline-flex items-center gap-1.5 border border-[#e8e0d0] hover:border-[#bfa06f]/50 text-[#4a4a4a] hover:text-[#bfa06f] text-[0.65rem] sm:text-sm font-semibold px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full transition-all duration-200"
+            >
+              <ArrowLeft className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              Back to News
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-1.5 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-[0.65rem] sm:text-sm font-semibold px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full transition-colors"
+            >
+              <Share2 className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+              {copied ? 'Link Copied!' : 'Share Article'}
+            </button>
+          </div>
         </div>
       </div>
-      
+
       <Footer />
     </>
   );
