@@ -65,7 +65,7 @@ const About = () => {
     <section
       ref={sectionRef}
       id="about"
-      aria-label="About SOK Law Associates — Nairobi law firm"
+      aria-label="About SOKLaw Advocates — Nairobi law firm"
       className="py-10 sm:py-20 lg:py-28 bg-[#f9f7f1] overflow-x-hidden"
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
