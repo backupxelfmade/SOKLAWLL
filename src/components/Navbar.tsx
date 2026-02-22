@@ -62,9 +62,9 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className={`fixed w-full z-50 transition-all duration-500 ${
+        className={`fixed w-full z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/10 backdrop-blur-xl border-b border-white/15 shadow-[0_4px_30px_rgba(0,0,0,0.15)]'
+            ? 'bg-[#f9f7f1]/95 backdrop-blur-md shadow-sm'
             : 'bg-transparent'
         }`}
       >
@@ -78,15 +78,23 @@ const Navbar = () => {
               className="flex flex-col gap-0.5 flex-shrink-0 group"
             >
               <div className="flex items-center gap-2">
-                <Scale className="h-5 w-5 sm:h-6 sm:w-6 text-[#bfa06f] transition-colors duration-300" />
+                <Scale
+                  className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 ${
+                    isScrolled ? 'text-[#bfa06f]' : 'text-[#bfa06f]'
+                  }`}
+                />
                 <img
                   src="https://soklaw.co.ke/images/logo.png"
                   alt="SOK Law"
-                  className="h-7 sm:h-8 md:h-9 w-auto object-contain brightness-0 invert"
+                  className="h-7 sm:h-8 md:h-9 w-auto object-contain"
                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
               </div>
-              <p className="text-[7px] sm:text-[8px] md:text-[9px] font-semibold tracking-[0.15em] uppercase leading-tight text-white/60">
+              <p
+                className={`text-[7px] sm:text-[8px] md:text-[9px] font-semibold tracking-[0.15em] uppercase leading-tight transition-colors duration-300 ${
+                  isScrolled ? 'text-[#7a6245]' : 'text-white/70'
+                }`}
+              >
                 Simiyu, Opondo, Kiranga & Co. Advocates
               </p>
             </Link>
@@ -99,11 +107,16 @@ const Navbar = () => {
                   onClick={() => handleNavigation(link)}
                   className={`relative px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-medium rounded-md transition-all duration-200 group ${
                     isActiveLink(link.href)
-                      ? 'text-[#bfa06f]'
-                      : 'text-white/80 hover:text-white'
+                      ? isScrolled
+                        ? 'text-[#bfa06f]'
+                        : 'text-[#bfa06f]'
+                      : isScrolled
+                      ? 'text-gray-600 hover:text-[#bfa06f]'
+                      : 'text-white/85 hover:text-white'
                   }`}
                 >
                   {link.label}
+                  {/* Animated underline */}
                   <span
                     className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-px bg-[#bfa06f] transition-all duration-300 ${
                       isActiveLink(link.href)
@@ -129,7 +142,11 @@ const Navbar = () => {
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isOpen}
-              className="md:hidden relative z-50 flex items-center justify-center w-9 h-9 rounded-full bg-white/10 text-white backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-200"
+              className={`md:hidden relative z-50 flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                isScrolled || isOpen
+                  ? 'bg-white/90 text-gray-700 shadow-sm'
+                  : 'bg-white/10 text-white backdrop-blur-sm'
+              }`}
             >
               <span
                 className={`absolute transition-all duration-200 ${
@@ -150,7 +167,8 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* ── Mobile Backdrop ── */}
+      {/* ── Mobile Drawer ── */}
+      {/* Backdrop */}
       <div
         onClick={() => setIsOpen(false)}
         className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden transition-opacity duration-300 ${
@@ -158,10 +176,11 @@ const Navbar = () => {
         }`}
       />
 
-      {/* ── Mobile Slide-in Drawer ── */}
+      {/* Slide-in panel */}
       <div
         className={`fixed top-0 right-0 h-full w-[75vw] max-w-[320px] z-50 md:hidden
-          bg-[#f9f7f1] shadow-2xl flex flex-col
+          bg-[#f9f7f1] shadow-2xl
+          flex flex-col
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
