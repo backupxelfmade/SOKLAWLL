@@ -49,7 +49,6 @@ const schemaMarkup = {
   priceRange: '$$',
 };
 
-/* Stagger helper */
 const stagger = (i: number, base = 120) => ({
   animationDelay: `${i * base}ms`,
   animationFillMode: 'both' as const,
@@ -62,10 +61,11 @@ const Hero = () => {
   const [mounted, setMounted]           = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  /* Trigger entrance animations after a single frame */
-  useEffect(() => { const t = setTimeout(() => setMounted(true), 80); return () => clearTimeout(t); }, []);
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
-  /* JSON-LD */
   useEffect(() => {
     const s = document.createElement('script');
     s.type = 'application/ld+json';
@@ -75,7 +75,6 @@ const Hero = () => {
     return () => { document.getElementById('sok-law-schema')?.remove(); };
   }, []);
 
-  /* Preload */
   useEffect(() => {
     slides.forEach((slide, i) => {
       const img = new Image();
@@ -84,7 +83,6 @@ const Hero = () => {
     });
   }, []);
 
-  /* Auto-advance */
   const startTimer = () => {
     intervalRef.current = setInterval(
       () => setCurrentSlide(p => (p + 1) % slides.length), 5500
@@ -116,7 +114,7 @@ const Hero = () => {
       className="relative w-full overflow-hidden flex flex-col justify-end"
       style={{ height: '100svh', minHeight: '580px', maxHeight: '960px' }}
     >
-      {/* ── Background slides — Ken Burns on active ── */}
+      {/* ── Background slides ── */}
       {slides.map((slide, i) => (
         <div
           key={i}
@@ -131,7 +129,7 @@ const Hero = () => {
           <img
             src={slide.image}
             alt={slide.alt}
-            className={`absolute inset-0 w-full h-full object-cover transition-none ${
+            className={`absolute inset-0 w-full h-full object-cover ${
               i === currentSlide ? 'ken-burns' : ''
             }`}
             style={{ objectPosition: slide.position }}
@@ -155,7 +153,7 @@ const Hero = () => {
       <div className="relative z-30 w-full px-5 sm:px-10 lg:px-16 pb-14 sm:pb-18 lg:pb-24">
         <div className="max-w-2xl">
 
-          {/* Eyebrow — line draws in, text fades up */}
+          {/* Eyebrow */}
           <div
             className={`flex items-center gap-2.5 mb-5 sm:mb-6 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
             style={stagger(0, 100)}
@@ -166,26 +164,26 @@ const Hero = () => {
             </span>
           </div>
 
-          {/* H1 line 1 */}
+          {/* H1 line 1 — gold */}
           <div
             className={`overflow-hidden mb-1 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
             style={stagger(1)}
           >
             <h1
-              className="text-white font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12]"
+              className="font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12] gold-shimmer"
               style={{ textShadow: '0 2px 32px rgba(0,0,0,0.5)' }}
             >
               When the Stakes Are High,
             </h1>
           </div>
 
-          {/* H1 line 2 — gold, slight extra delay */}
+          {/* H1 line 2 — gold */}
           <div
             className={`overflow-hidden mb-5 sm:mb-6 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
             style={stagger(2)}
           >
             <h1
-              className="text-[#bfa06f] font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12] gold-shimmer"
+              className="font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12] gold-shimmer"
               style={{ textShadow: '0 2px 32px rgba(0,0,0,0.5)' }}
             >
               You Need the Right Advocate.
@@ -231,9 +229,10 @@ const Hero = () => {
 
             <a
               href="tel:+254205285048"
-              className="group flex items-center justify-center gap-2 border border-white/25 hover:border-white/55 hover:bg-white/10 text-white/80 hover:text-white font-semibold text-sm sm:text-[0.95rem] px-6 sm:px-8 py-3.5 rounded-full backdrop-blur-sm transition-all duration-200"
+              style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'none' }}
+              className="group flex items-center justify-center gap-2 border border-white/25 hover:border-white/55 hover:bg-white/10 hover:!text-white font-semibold text-sm sm:text-[0.95rem] px-6 sm:px-8 py-3.5 rounded-full backdrop-blur-sm transition-all duration-200"
             >
-              <Phone className="h-4 w-4 flex-shrink-0" />
+              <Phone className="h-4 w-4 flex-shrink-0" style={{ color: '#bfa06f' }} />
               <span>+254 (0) 20 5285048</span>
             </a>
           </div>
@@ -287,7 +286,6 @@ const Hero = () => {
       </div>
 
       <style>{`
-        /* ── Entrance: slide up + fade ── */
         @keyframes heroFadeUp {
           from { opacity: 0; transform: translateY(28px); }
           to   { opacity: 1; transform: translateY(0);    }
@@ -296,43 +294,38 @@ const Hero = () => {
           animation: heroFadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        /* ── Gold rule draw-in ── */
         @keyframes drawLine {
-          from { width: 0;    }
+          from { width: 0;      }
           to   { width: 2.5rem; }
-        }
-        @media (min-width: 640px) {
-          @keyframes drawLine {
-            from { width: 0;      }
-            to   { width: 2.5rem; }
-          }
         }
         .draw-line {
           animation: drawLine 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
         }
 
-        /* ── Gold headline shimmer sweep ── */
         @keyframes shimmer {
           0%   { background-position: -200% center; }
-          100% { background-position: 200% center;  }
+          100% { background-position:  200% center; }
         }
         .gold-shimmer {
+          color: #bfa06f;
           background: linear-gradient(
             105deg,
             #bfa06f 0%,
-            #bfa06f 40%,
+            #bfa06f 38%,
             #e8c97a 50%,
-            #bfa06f 60%,
+            #bfa06f 62%,
             #bfa06f 100%
           );
           background-size: 200% auto;
           -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           background-clip: text;
+          -webkit-text-fill-color: transparent;
           animation: shimmer 3s linear 1.2s 1 forwards;
         }
+        @supports not (-webkit-text-fill-color: transparent) {
+          .gold-shimmer { color: #bfa06f; background: none; }
+        }
 
-        /* ── Ken Burns on active slide ── */
         @keyframes kenBurns {
           from { transform: scale(1.06); }
           to   { transform: scale(1.0);  }
@@ -341,7 +334,6 @@ const Hero = () => {
           animation: kenBurns 6s ease-out forwards;
         }
 
-        /* ── Scroll cue ── */
         @keyframes scrollLine {
           0%   { transform: translateY(-100%); }
           100% { transform: translateY(300%);  }
