@@ -10,23 +10,23 @@ const Hero = () => {
       image: 'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
       title: 'Expert Legal Representation',
       position: 'center 30%',
-      mobilePosition: 'center 35%'
+      mobilePosition: 'center 35%',
     },
     {
       image: 'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
       title: 'Comprehensive Legal Solutions',
       position: 'center 30%',
-      mobilePosition: 'center 35%'
+      mobilePosition: 'center 35%',
     },
     {
       image: 'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
       title: 'Your Trusted Legal Partner',
       position: 'center 50%',
-      mobilePosition: 'center 45%'
+      mobilePosition: 'center 45%',
     },
   ];
 
-  // Preload images for better performance
+  // Preload images
   useEffect(() => {
     const loadImages = async () => {
       const imagePromises = slides.map((slide, index) => {
@@ -37,47 +37,35 @@ const Hero = () => {
           img.src = slide.image;
         });
       });
-      
+
       const results = await Promise.all(imagePromises);
       setImagesLoaded(results);
     };
-    
+
     loadImages();
   }, []);
 
+  // Auto-rotate slides
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 4000);
+    }, 5000);
+
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const scrollToContact = () => {
-    const element = document.querySelector('#contact');
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+  const scrollToTarget = (selector: string) => {
+    const element = document.querySelector(selector);
+    if (!element) return;
 
-  const scrollToServices = () => {
-    const element = document.querySelector('#services');
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
+    const headerOffset = 80;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth',
+    });
   };
 
   const nextSlide = () => {
@@ -91,21 +79,31 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative h-screen w-full flex items-center justify-center overflow-hidden"
+      className="
+        relative w-full
+        min-h-[70vh] md:min-h-[80vh] lg:h-screen
+        flex items-center
+        overflow-hidden
+      "
+      aria-label="Law firm hero section"
     >
-      {/* Background Images */}
+      {/* Background Slides */}
       {slides.map((slide, index) => (
         <div
           key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`
+            absolute inset-0
+            transition-opacity duration-700 ease-out
+            ${index === currentSlide ? 'opacity-100' : 'opacity-0'}
+          `}
+          aria-hidden={index !== currentSlide}
         >
           {!imagesLoaded[index] && (
             <div className="absolute inset-0 bg-gradient-to-br from-[#bfa06f] to-[#8b7355] flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white" />
             </div>
           )}
+
           <div className="w-full h-full relative bg-[#2a2a2a]">
             <img
               src={slide.image}
@@ -116,10 +114,10 @@ const Hero = () => {
               }}
               loading={index === 0 ? 'eager' : 'lazy'}
               onLoad={() => {
-                setImagesLoaded(prev => {
-                  const newState = [...prev];
-                  newState[index] = true;
-                  return newState;
+                setImagesLoaded((prev) => {
+                  const next = [...prev];
+                  next[index] = true;
+                  return next;
                 });
               }}
               onError={(e) => {
@@ -127,74 +125,146 @@ const Hero = () => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
                 if (target.parentElement) {
-                  target.parentElement.style.background = 'linear-gradient(135deg, #bfa06f 0%, #8b7355 100%)';
+                  target.parentElement.style.background =
+                    'linear-gradient(135deg, #bfa06f 0%, #8b7355 100%)';
                 }
               }}
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/10 to-black/40"></div>
+
+          {/* Dark overlay for contrast */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/70" />
         </div>
       ))}
 
-      {/* Invisible Navigation Buttons */}
+      {/* Slide click areas (kept but reduced height on mobile) */}
       <button
         onClick={prevSlide}
-        className="absolute left-0 top-0 w-1/2 h-[70%] z-20 opacity-0 cursor-pointer touch-manipulation"
-        aria-label="Previous Slide"
+        className="absolute left-0 top-0 w-1/2 h-full lg:h-[80%] z-10 opacity-0 cursor-pointer touch-manipulation"
+        aria-label="Previous slide"
       />
       <button
         onClick={nextSlide}
-        className="absolute right-0 top-0 w-1/2 h-[70%] z-20 opacity-0 cursor-pointer touch-manipulation"
-        aria-label="Next Slide"
+        className="absolute right-0 top-0 w-1/2 h-full lg:h-[80%] z-10 opacity-0 cursor-pointer touch-manipulation"
+        aria-label="Next slide"
       />
 
-      {/* Hero Content */}
-      <div className="relative z-10 w-full h-full flex flex-col px-4 sm:px-6 lg:px-8">
-        {/* Spacer to push content down */}
-        <div className="flex-1"></div>
+      {/* Content */}
+      <div
+        className="
+          relative z-20
+          w-full
+          px-4 sm:px-6 lg:px-10
+          flex items-center
+        "
+      >
+        <div
+          className="
+            max-w-3xl mx-auto
+            text-center
+            py-16 sm:py-18 md:py-20
+            flex flex-col gap-6
+          "
+        >
+          {/* Badge / Eyebrow */}
+          <div className="inline-flex items-center justify-center gap-2 self-center bg-black/40 border border-white/20 text-xs sm:text-sm text-white/80 px-3 sm:px-4 py-1.5 rounded-full backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#bfa06f]" />
+            <span>Toronto-Based Law Firm</span>
+          </div>
 
-        {/* Title in middle-lower area */}
-        <div className="text-center animate-fade-in-up mb-12 md:mb-16">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight"
-              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-            {slides[currentSlide].title}
-          </h1>
-        </div>
+          {/* Heading + Subcopy */}
+          <div className="space-y-3 sm:space-y-4">
+            <h1
+              className="
+                text-white font-semibold
+                text-[1.7rem] leading-tight
+                sm:text-3xl md:text-4xl lg:text-5xl
+              "
+              style={{ textShadow: '0 10px 30px rgba(0,0,0,0.8)' }}
+            >
+              {slides[currentSlide].title}
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-white/80 max-w-xl mx-auto">
+              Strategic counsel for complex disputes, transactions, and regulatory matters—delivered with discretion and clarity.
+            </p>
+          </div>
 
-        {/* Action Buttons at bottom */}
-        <div className="pb-20 md:pb-24">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up-delay px-4 max-w-4xl mx-auto">
+          {/* CTA Row */}
+          <div
+            className="
+              flex flex-col sm:flex-row
+              gap-3 sm:gap-4
+              justify-center
+              mt-2 sm:mt-4
+            "
+          >
             <button
-              onClick={scrollToContact}
-              className="group bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold rounded-lg flex items-center justify-center space-x-2 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl text-sm sm:text-base md:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto min-w-[280px]"
+              onClick={() => scrollToTarget('#contact')}
+              className="
+                group
+                bg-[#bfa06f] hover:bg-[#a08a5f]
+                text-white font-semibold
+                rounded-full
+                flex items-center justify-center gap-2
+                shadow-lg hover:shadow-xl
+                transition-all duration-200
+                text-sm sm:text-base
+                px-5 sm:px-7 py-3
+                w-full sm:w-auto
+              "
             >
-              <Phone className="h-5 w-5" />
-              <span>Get Legal Consultation</span>
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span>Book a Consultation</span>
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
             </button>
+
             <button
-              onClick={scrollToServices}
-              className="group bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border-2 border-white font-semibold rounded-lg flex items-center justify-center space-x-2 transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl text-sm sm:text-base md:text-lg px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto min-w-[280px]"
+              onClick={() => scrollToTarget('#services')}
+              className="
+                group
+                bg-white/5 hover:bg-white/15
+                border border-white/30
+                text-white font-medium
+                rounded-full
+                flex items-center justify-center gap-2
+                shadow-md hover:shadow-lg
+                backdrop-blur-sm
+                transition-all duration-200
+                text-sm sm:text-base
+                px-5 sm:px-7 py-3
+                w-full sm:w-auto
+              "
             >
-              <span>Our Services</span>
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <span>View Practice Areas</span>
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
             </button>
+          </div>
+
+          {/* Secondary info (very compact) */}
+          <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-white/70 mt-2">
+            <span className="flex items-center gap-2">
+              <span className="h-1 w-6 bg-[#bfa06f]/80 rounded-full" />
+              24/7 case intake
+            </span>
+            <span className="hidden xs:inline text-white/30">•</span>
+            <span>Confidential, no‑obligation call</span>
           </div>
         </div>
       </div>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30 flex space-x-3">
+      <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? 'bg-[#bfa06f] w-8'
-                : 'bg-white/50 hover:bg-white/75'
-            }`}
+            className={`
+              h-1.5 rounded-full
+              transition-all duration-200
+              ${index === currentSlide ? 'w-6 bg-[#bfa06f]' : 'w-2.5 bg-white/50 hover:bg-white/80'}
+            `}
             aria-label={`Go to slide ${index + 1}`}
+            aria-current={index === currentSlide}
           />
         ))}
       </div>
