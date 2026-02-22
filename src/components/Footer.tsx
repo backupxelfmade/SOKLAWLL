@@ -7,13 +7,13 @@ const Footer = () => {
   const location = useLocation();
 
   const quickLinks = [
-    { label: 'Home',           href: '/',        isRoute: true  },
-    { label: 'About Us',       href: '#about',   isRoute: false },
-    { label: 'Our Team',       href: '/team',    isRoute: true  },
-    { label: 'Legal Services', href: '/services',isRoute: true  },
-    { label: 'Careers',        href: '/careers', isRoute: true  },
-    { label: 'Contact Us',     href: '/contact', isRoute: true  },
-    { label: 'Blog',           href: '#news',    isRoute: false },
+    { label: 'Home',           href: '/',         isRoute: true  },
+    { label: 'About Us',       href: '#about',    isRoute: false },
+    { label: 'Our Team',       href: '/team',     isRoute: true  },
+    { label: 'Legal Services', href: '/services', isRoute: true  },
+    { label: 'Careers',        href: '/careers',  isRoute: true  },
+    { label: 'Contact Us',     href: '/contact',  isRoute: true  },
+    { label: 'Blog',           href: '#news',     isRoute: false },
   ];
 
   const legalServices = [
@@ -44,9 +44,9 @@ const Footer = () => {
   );
 
   const socialLinks = [
-    { Icon: XIcon,         href: 'https://twitter.com/SOK_Law',                  label: 'X (Twitter)' },
-    { Icon: LinkedinIcon,  href: 'https://www.linkedin.com/company/soklaw',       label: 'LinkedIn'    },
-    { Icon: InstagramIcon, href: 'https://www.instagram.com/soklaw',              label: 'Instagram'   },
+    { Icon: XIcon,         href: 'https://twitter.com/SOK_Law',             label: 'X (Twitter)' },
+    { Icon: LinkedinIcon,  href: 'https://www.linkedin.com/company/soklaw', label: 'LinkedIn'    },
+    { Icon: InstagramIcon, href: 'https://www.instagram.com/soklaw',        label: 'Instagram'   },
   ];
 
   const handleNavigation = (href: string, isRoute: boolean) => {
@@ -73,23 +73,23 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-[#1a1a1a] text-white">
+    <footer className="bg-[#f9f7f1] border-t border-[#e8e0d0]">
 
       {/* ── Main grid ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-10 sm:pb-14">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
 
           {/* ── Col 1 — Brand ── */}
-          <div className="col-span-2 sm:col-span-2 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <img
               src="https://soklaw.co.ke/images/logo.png"
               alt="SOKLAW Logo"
-              className="h-9 sm:h-10 w-auto mb-3 brightness-0 invert"
+              className="h-9 sm:h-10 w-auto mb-3"
             />
             <p className="text-[0.6rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f] mb-3 leading-relaxed">
               Simiyu, Opondo, Kiranga & Company Advocates
             </p>
-            <p className="text-[0.7rem] sm:text-sm text-white/50 leading-relaxed mb-5 max-w-xs">
+            <p className="text-[0.7rem] sm:text-sm text-[#6a6a6a] leading-relaxed mb-5 max-w-xs">
               A full-service law firm in Nairobi offering strategic, dependable
               legal solutions with integrity and diligence.
             </p>
@@ -103,7 +103,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="flex items-center justify-center w-8 h-8 rounded-full bg-white/8 hover:bg-[#bfa06f] text-white/60 hover:text-white transition-all duration-200"
+                  className="flex items-center justify-center w-8 h-8 rounded-full bg-[#e8e0d0] hover:bg-[#bfa06f] text-[#6a6a6a] hover:text-white transition-all duration-200"
                 >
                   <Icon />
                 </a>
@@ -124,7 +124,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <button
                     onClick={() => handleNavigation(link.href, link.isRoute)}
-                    className="group flex items-center gap-1.5 text-[0.7rem] sm:text-sm text-white/55 hover:text-white transition-colors duration-200 text-left"
+                    className="group flex items-center gap-1.5 text-[0.7rem] sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors duration-200 text-left"
                   >
                     <ArrowRight className="h-2.5 w-2.5 text-[#bfa06f] opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200 flex-shrink-0" />
                     {link.label}
@@ -134,7 +134,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* ── Col 3 — Legal Services ── */}
+          {/* ── Col 3 — Practice Areas ── */}
           <div>
             <div className="flex items-center gap-2 mb-4 sm:mb-5">
               <span className="block h-px w-4 bg-[#bfa06f]" />
@@ -147,7 +147,7 @@ const Footer = () => {
                 <li key={service}>
                   <button
                     onClick={() => handleNavigation('/services', true)}
-                    className="group flex items-center gap-1.5 text-[0.7rem] sm:text-sm text-white/55 hover:text-white transition-colors duration-200 text-left"
+                    className="group flex items-center gap-1.5 text-[0.7rem] sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors duration-200 text-left"
                   >
                     <ArrowRight className="h-2.5 w-2.5 text-[#bfa06f] opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all duration-200 flex-shrink-0" />
                     {service}
@@ -168,7 +168,7 @@ const Footer = () => {
             <ul className="space-y-3 sm:space-y-4 mb-5">
               <li className="flex items-start gap-2.5">
                 <MapPin className="h-3.5 w-3.5 text-[#bfa06f] mt-0.5 flex-shrink-0" />
-                <span className="text-[0.7rem] sm:text-sm text-white/55 leading-relaxed">
+                <span className="text-[0.7rem] sm:text-sm text-[#4a4a4a] leading-relaxed">
                   Upperhill Gardens, Block D11, 3rd Ngong Avenue,
                   Milimani Area opp Kenya National Library Service
                 </span>
@@ -177,7 +177,7 @@ const Footer = () => {
                 <Phone className="h-3.5 w-3.5 text-[#bfa06f] flex-shrink-0" />
                 <a
                   href="tel:+254202285048"
-                  className="text-[0.7rem] sm:text-sm text-white/55 hover:text-white transition-colors"
+                  className="text-[0.7rem] sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
                 >
                   +254 (0) 20 5285048
                 </a>
@@ -186,7 +186,7 @@ const Footer = () => {
                 <Mail className="h-3.5 w-3.5 text-[#bfa06f] flex-shrink-0" />
                 <a
                   href="mailto:info@soklaw.co.ke"
-                  className="text-[0.7rem] sm:text-sm text-white/55 hover:text-white transition-colors"
+                  className="text-[0.7rem] sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
                 >
                   info@soklaw.co.ke
                 </a>
@@ -196,7 +196,7 @@ const Footer = () => {
             {/* Blog CTA */}
             <button
               onClick={() => handleNavigation('#news', false)}
-              className="group flex items-center gap-2 text-[0.7rem] sm:text-xs font-semibold text-[#bfa06f] hover:text-white border border-[#bfa06f]/40 hover:border-[#bfa06f] hover:bg-[#bfa06f] px-3.5 py-2 rounded-full transition-all duration-200"
+              className="group flex items-center gap-2 text-[0.7rem] sm:text-xs font-semibold text-[#bfa06f] hover:text-white border border-[#bfa06f]/50 hover:border-[#bfa06f] hover:bg-[#bfa06f] px-3.5 py-2 rounded-full transition-all duration-200"
             >
               <Newspaper className="h-3.5 w-3.5" />
               <span>Latest Blog Posts</span>
@@ -207,7 +207,7 @@ const Footer = () => {
       </div>
 
       {/* ── Divider ── */}
-      <div className="border-t border-white/8" />
+      <div className="border-t border-[#e8e0d0]" />
 
       {/* ── Bottom bar ── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-5 sm:py-6 pb-20 sm:pb-6">
@@ -216,8 +216,8 @@ const Footer = () => {
           {/* Partner logos */}
           <div className="flex items-center gap-4 order-2 sm:order-1">
             {[
-              { href: 'https://kenyalaw.org',    src: 'https://soklaw.co.ke/images/KLR-logo.jpg',                  alt: 'Kenya Law Reports'    },
-              { href: 'https://www.lsk.or.ke',   src: 'https://soklaw.co.ke/images/law-society-of-kenya.jpg',      alt: 'Law Society of Kenya' },
+              { href: 'https://kenyalaw.org',  src: 'https://soklaw.co.ke/images/KLR-logo.jpg',             alt: 'Kenya Law Reports'    },
+              { href: 'https://www.lsk.or.ke', src: 'https://soklaw.co.ke/images/law-society-of-kenya.jpg', alt: 'Law Society of Kenya' },
             ].map(({ href, src, alt }) => (
               <a
                 key={alt}
@@ -230,7 +230,7 @@ const Footer = () => {
                 <img
                   src={src}
                   alt={alt}
-                  className="h-9 sm:h-10 w-auto rounded opacity-60 group-hover:opacity-100 transition-opacity duration-200"
+                  className="h-9 sm:h-10 w-auto rounded opacity-70 group-hover:opacity-100 transition-opacity duration-200"
                 />
                 <span className="absolute inset-0 rounded border border-transparent group-hover:border-[#bfa06f]/50 transition-all duration-200 pointer-events-none" />
               </a>
@@ -238,7 +238,7 @@ const Footer = () => {
           </div>
 
           {/* Copyright */}
-          <p className="text-[0.65rem] sm:text-xs text-white/35 text-center order-1 sm:order-2">
+          <p className="text-[0.65rem] sm:text-xs text-[#6a6a6a] text-center order-1 sm:order-2">
             © {new Date().getFullYear()} SOKLAW Advocates. All Rights Reserved.
           </p>
         </div>
