@@ -1,5 +1,35 @@
 import React, { useEffect, useRef } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { Shield, Users, Lightbulb, Award } from 'lucide-react';
+
+const stats = [
+  { num: '15', suffix: '+', label: 'Years of practice' },
+  { num: '98', suffix: '%', label: 'Case success rate' },
+  { num: '1K', suffix: '+', label: 'Satisfied clients' },
+  { num: '14',  suffix: '',  label: 'Practice areas'   },
+];
+
+const pillars = [
+  {
+    icon: Shield,
+    title: 'Proven Legal Expertise',
+    body: 'Deep knowledge across 14 practice areas — from commercial litigation to family succession — grounded in 15 years of Kenyan legal practice.',
+  },
+  {
+    icon: Users,
+    title: 'Personalised Strategy',
+    body: 'Every mandate gets a bespoke approach built around your circumstances and goals. No templates — only counsel that truly fits.',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Integrity & Transparency',
+    body: 'Clear communication on fees, strategy, and outcomes. We hold ourselves to the highest ethical standards in every engagement.',
+  },
+  {
+    icon: Award,
+    title: 'End-to-End Representation',
+    body: 'From initial consultation through final resolution, your dedicated attorney manages every step so you can focus on what matters.',
+  },
+];
 
 const WhyChooseUs = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -9,175 +39,127 @@ const WhyChooseUs = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.bento-card').forEach((card, i) => {
-              setTimeout(() => card.classList.add('animate-fade-in-up'), i * 80);
+            entry.target.querySelectorAll('.anim-item').forEach((el, i) => {
+              setTimeout(() => el.classList.add('anim-visible'), i * 80);
             });
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.08 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-10 sm:py-20 lg:py-28 bg-[#f9f7f1]">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
+    <section ref={sectionRef} className="py-12 sm:py-20 lg:py-28 bg-[#0d2340] relative overflow-hidden">
+
+      {/* Decorative diagonal stripe */}
+      <div
+        className="hidden lg:block absolute right-0 top-0 bottom-0 w-1/3 opacity-[0.04] pointer-events-none"
+        style={{ backgroundImage: 'repeating-linear-gradient(-55deg, #bfa06f 0px, #bfa06f 1px, transparent 1px, transparent 28px)' }}
+      />
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 relative z-10">
 
         {/* ── Header ── */}
-        <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div className="anim-item flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-8 sm:mb-12 lg:mb-14">
           <div>
             <div className="flex items-center gap-2 mb-2 sm:mb-3">
-              <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
-              <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+              <span className="block h-px w-5 sm:w-8 bg-[#bfa06f] flex-shrink-0" />
+              <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#bfa06f]">
                 Our Difference
               </span>
             </div>
-            <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
               Why Choose Us
             </h2>
           </div>
-          <p className="hidden sm:block text-sm text-[#6a6a6a] max-w-xs leading-relaxed sm:text-right">
+          <p className="hidden sm:block text-sm text-white/50 max-w-xs leading-relaxed sm:text-right">
             Trusted by individuals, corporations, and institutions across Kenya.
           </p>
         </div>
 
-        {/* ── Bento grid ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 lg:gap-4">
+        {/* ── Stat strip ── */}
+        <div className="anim-item grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 rounded-xl sm:rounded-2xl overflow-hidden mb-8 sm:mb-12 lg:mb-14">
+          {stats.map(({ num, suffix, label }) => (
+            <div
+              key={label}
+              className="bg-[#0d2340] hover:bg-[#0f2a4a] transition-colors px-4 sm:px-6 py-4 sm:py-6"
+            >
+              <div className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-none mb-1 sm:mb-1.5">
+                {num}<span className="text-[#bfa06f]">{suffix}</span>
+              </div>
+              <p className="text-[0.58rem] sm:text-xs text-white/45 font-medium uppercase tracking-widest">
+                {label}
+              </p>
+            </div>
+          ))}
+        </div>
 
-          {/* ── Card 1 — Large feature image ── */}
+        {/* ── Content — image + feature grid ── */}
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 items-stretch">
+
+          {/* Image */}
           <div
-            className="bento-card opacity-0 col-span-2 lg:col-span-5 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl group cursor-default"
-            style={{ height: 'clamp(220px, 55vw, 520px)' }}
+            className="anim-item relative rounded-xl sm:rounded-2xl overflow-hidden"
+            style={{ minHeight: 'clamp(240px, 52vw, 520px)' }}
           >
             <img
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
               alt="SOK Law Team"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{ objectPosition: 'center 25%' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
-            <div className="absolute inset-0 p-4 sm:p-7 flex flex-col justify-end">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <span className="block h-px w-4 sm:w-5 bg-[#bfa06f]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0d2340]/92 via-[#0d2340]/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-7">
+              <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                <span className="block h-px w-4 bg-[#bfa06f] flex-shrink-0" />
                 <span className="text-[0.55rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
                   Established 2009
                 </span>
               </div>
-              <h3 className="text-white font-bold leading-tight mb-2 sm:mb-3
-                text-sm sm:text-2xl lg:text-3xl">
+              <h3 className="text-white font-bold text-sm sm:text-xl lg:text-2xl leading-tight">
                 A Legacy of Legal Excellence
               </h3>
-              <p className="text-white/65 leading-relaxed hidden sm:block
-                text-[0.6rem] sm:text-sm lg:text-base">
-                Over 15 years serving individuals, corporations, and institutions
-                across Kenya with integrity, precision, and unwavering commitment.
+              <p className="hidden sm:block text-white/60 text-xs sm:text-sm mt-1.5 leading-relaxed max-w-sm">
+                Over 15 years serving individuals, corporations, and institutions across
+                Kenya with integrity, precision, and unwavering commitment.
               </p>
             </div>
           </div>
 
-          {/* ── Card 2 — Years — gold fill ── */}
-          <div className="bento-card opacity-0 col-span-1 lg:col-span-4 bg-[#bfa06f] rounded-xl sm:rounded-2xl p-3 sm:p-6 flex flex-col justify-between group hover:bg-[#a08a5f] transition-colors duration-300 cursor-default">
-            <div className="flex items-start justify-between">
-              <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-white/70">
-                Experience
-              </span>
-              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-white/50 group-hover:text-white transition-colors" />
-            </div>
-            <div>
-              <div className="font-black text-white leading-none mb-0.5 sm:mb-1
-                text-4xl sm:text-6xl lg:text-7xl">
-                15+
-              </div>
-              <p className="text-white/70 font-medium text-[0.6rem] sm:text-sm">
-                Years of legal practice
-              </p>
-            </div>
-          </div>
-
-          {/* ── Card 3 — Success Rate ── */}
-          <div className="bento-card opacity-0 col-span-1 lg:col-span-3 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-6 flex flex-col justify-between group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
-            <div className="flex items-start justify-between">
-              <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
-                Track Record
-              </span>
-              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]/40 group-hover:text-[#bfa06f] transition-colors" />
-            </div>
-            <div>
-              <div className="font-black text-[#1a1a1a] leading-none mb-0.5 sm:mb-1
-                text-4xl sm:text-6xl lg:text-7xl">
-                98<span className="text-[#bfa06f]">%</span>
-              </div>
-              <p className="text-[#6a6a6a] font-medium text-[0.6rem] sm:text-sm">
-                Case success rate
-              </p>
-            </div>
-          </div>
-
-          {/* ── Card 4 — Clients ── */}
-          <div className="bento-card opacity-0 col-span-1 lg:col-span-3 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-6 flex flex-col justify-between group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
-            <div className="flex items-start justify-between">
-              <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
-                Clients
-              </span>
-              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]/40 group-hover:text-[#bfa06f] transition-colors" />
-            </div>
-            <div>
-              <div className="font-black text-[#1a1a1a] leading-none mb-0.5 sm:mb-1
-                text-4xl sm:text-6xl lg:text-7xl">
-                1K<span className="text-[#bfa06f]">+</span>
-              </div>
-              <p className="text-[#6a6a6a] font-medium text-[0.6rem] sm:text-sm">
-                Satisfied clients
-              </p>
-            </div>
-          </div>
-
-          {/* ── Card 5 — Personalised — full remaining width ── */}
-          <div className="bento-card opacity-0 col-span-2 lg:col-span-7 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
-            <div className="flex items-start justify-between mb-3 sm:mb-5">
-              <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
-                Our Approach
-              </span>
-              <ArrowUpRight className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]/40 group-hover:text-[#bfa06f] transition-colors" />
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-6">
-              <div>
-                <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300 group-hover:w-7 sm:group-hover:w-9" />
-                <h3 className="text-[#1a1a1a] font-bold leading-tight
-                  text-xs sm:text-xl lg:text-2xl">
-                  Personalised Legal Strategy
+          {/* Feature cards — 2×2 on sm+, stacked on mobile */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 content-start">
+            {pillars.map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="anim-item group bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[#bfa06f]/30 rounded-xl sm:rounded-2xl p-4 sm:p-5 transition-all duration-300"
+              >
+                <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#bfa06f]/15 group-hover:bg-[#bfa06f]/25 transition-colors mb-3 sm:mb-3.5 flex-shrink-0">
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-bold text-white mb-1.5 leading-snug">
+                  {title}
                 </h3>
-                <p className="text-[#6a6a6a] leading-relaxed mt-1 sm:mt-2 hidden sm:block
-                  sm:text-sm lg:text-base max-w-lg">
-                  Every mandate handled with a bespoke strategy built around your
-                  specific circumstances, goals, and risk profile — no cookie-cutter
-                  solutions, only counsel that fits.
+                <p className="text-[0.63rem] sm:text-xs text-white/50 leading-relaxed">
+                  {body}
                 </p>
               </div>
-              <div className="text-right flex-shrink-0">
-                <div className="text-2xl sm:text-5xl lg:text-6xl font-black text-[#1a1a1a] leading-none">
-                  1:1
-                </div>
-                <div className="text-[0.55rem] sm:text-xs text-[#6a6a6a] font-medium mt-0.5">
-                  Dedicated counsel
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-
         </div>
       </div>
 
       <style>{`
-        .animate-fade-in-up {
-          animation: fadeInUp 0.5s ease-out forwards;
+        .anim-item {
+          opacity: 0;
+          transform: translateY(18px);
+          transition: opacity 0.55s ease-out, transform 0.55s ease-out;
         }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
+        .anim-visible {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
         }
       `}</style>
     </section>
