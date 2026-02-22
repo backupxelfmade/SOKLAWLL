@@ -1,50 +1,46 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import Footer from '../components/Footer';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    name: '', email: '', phone: '', subject: '', message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState('idle');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (submitStatus !== 'idle') setSubmitStatus('idle');
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
     setErrorMessage('');
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      if (!response.ok) throw new Error('Failed to send message');
       setSubmitStatus('success');
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-
-      setTimeout(() => setSubmitStatus('idle'), 5000);
-    } catch (error) {
-      console.error('Error sending message:', error);
+      setTimeout(() => setSubmitStatus('idle'), 6000);
+    } catch (err) {
+      console.error('Error sending message:', err);
       setSubmitStatus('error');
       setErrorMessage('Failed to send message. Please try again or contact us directly.');
     } finally {
@@ -52,201 +48,253 @@ const ContactPage = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f9f7f1] to-white">
-      <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  const inputClass =
+    'w-full px-3.5 sm:px-4 py-2.5 sm:py-3 border border-[#e8e0d0] focus:border-[#bfa06f] rounded-xl text-sm text-[#1a1a1a] placeholder-[#aaa] bg-white outline-none transition-colors duration-200';
 
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Get In Touch</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Have a legal matter or question? We're here to help. Reach out to us and we'll respond as soon as possible.
+  const labelClass =
+    'block text-[0.7rem] sm:text-xs font-semibold uppercase tracking-widest text-[#4a4a4a] mb-1.5';
+
+  const infoItems = [
+    {
+      icon: MapPin,
+      label: 'Office Location',
+      content: (
+        <p className="text-xs sm:text-sm text-[#4a4a4a] leading-relaxed">
+          Upperhill Gardens, Block D11, 3rd Ngong Avenue<br />
+          Milimani Area opp Kenya National Library Service
+        </p>
+      ),
+    },
+    {
+      icon: Phone,
+      label: 'Phone',
+      content: (
+        <a href="tel:+254205285048" className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors">
+          +254 (0) 20 5285048
+        </a>
+      ),
+    },
+    {
+      icon: Mail,
+      label: 'Email',
+      content: (
+        <a href="mailto:info@soklaw.co.ke" className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors">
+          info@soklaw.co.ke
+        </a>
+      ),
+    },
+    {
+      icon: Clock,
+      label: 'Office Hours',
+      content: (
+        <div className="space-y-1.5">
+          {[
+            { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
+            { day: 'Saturday',        hours: '9:00 AM – 2:00 PM' },
+            { day: 'Sunday',          hours: 'Emergency Only'     },
+          ].map(({ day, hours }) => (
+            <div key={day} className="flex items-center justify-between gap-4">
+              <span className="text-xs sm:text-sm text-[#4a4a4a]">{day}</span>
+              <span className="text-xs sm:text-sm font-semibold text-[#1a1a1a]">{hours}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#f9f7f1]">
+      <div className="pt-24 sm:pt-28 pb-16 sm:pb-24">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
+
+          {/* ── Section header ── */}
+          <div className="mb-8 sm:mb-14">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
+              <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                Contact Us
+              </span>
+            </div>
+            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
+              Get In Touch
+            </h1>
+            <p className="hidden sm:block text-base text-[#4a4a4a] max-w-xl mt-3 leading-relaxed">
+              Have a legal matter or question? We're here to help. Reach out and
+              we'll respond as soon as possible.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 items-start mb-6 sm:mb-10">
 
-            {/* Contact Info Cards */}
-            <div className="lg:col-span-1 space-y-6">
-
-              {/* Office Location */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-[#bfa06f] p-3 rounded-lg">
-                    <MapPin className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Office Location</h3>
-                    <p className="text-gray-600 text-sm">
-                      Upperhill Gardens, Block D1, 5th Floor<br />
-                      Ragati Road, Nairobi, Kenya
-                    </p>
+            {/* ── Left col — info cards ── */}
+            <div className="space-y-3 sm:space-y-4">
+              {infoItems.map(({ icon: Icon, label, content }) => (
+                <div
+                  key={label}
+                  className="bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:border-[#bfa06f]/40 hover:shadow-sm transition-all duration-200"
+                >
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#bfa06f]/10 flex-shrink-0">
+                      <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[0.65rem] sm:text-xs font-semibold uppercase tracking-widest text-[#bfa06f] mb-1.5">
+                        {label}
+                      </p>
+                      {content}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
 
-              {/* Phone */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-[#bfa06f] p-3 rounded-lg">
-                    <Phone className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
-                    <a href="tel:+254205285048" className="text-[#bfa06f] hover:underline text-sm">
-                      +254 20 528 5048
-                    </a>
-                  </div>
-                </div>
+              {/* Map */}
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e0d0] shadow-sm">
+                <iframe
+                  title="Office Map"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.820262983408!2d36.81541707534238!3d-1.2993107356429749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d9103a4f51%3A0xf8f3addf8df84972!2sUpper%20Hill%20Gardens%2C%20Ragati%20Rd%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske"
+                  width="100%"
+                  height="220"
+                  style={{ border: 0, display: 'block' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
-
-              {/* Email */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-[#bfa06f] p-3 rounded-lg">
-                    <Mail className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
-                    <a href="mailto:info@soklaw.co.ke" className="text-[#bfa06f] hover:underline text-sm">
-                      info@soklaw.co.ke
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Office Hours */}
-              <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-[#bfa06f] p-3 rounded-lg">
-                    <Clock className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Office Hours</h3>
-                    <p className="text-gray-600 text-sm">
-                      Monday - Friday: 8:00 AM - 5:00 PM<br />
-                      Saturday: 9:00 AM - 1:00 PM<br />
-                      Sunday: Closed
-                    </p>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
+            {/* ── Right col — form ── */}
+            <div className="bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="block h-px w-4 bg-[#bfa06f]" />
+                <span className="text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                  Send a Message
+                </span>
+              </div>
+              <h2 className="text-base sm:text-xl font-bold text-[#1a1a1a] mb-5 sm:mb-7">
+                We'll Respond Within 24 Hours
+              </h2>
 
-                {submitStatus === 'success' && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-green-900">Message Sent Successfully!</h4>
-                      <p className="text-sm text-green-700">We'll get back to you as soon as possible.</p>
-                    </div>
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+                {/* Name + Email */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Full Name *</label>
+                    <input
+                      type="text" name="name" value={formData.name}
+                      onChange={handleChange} placeholder="Your full name"
+                      required autoComplete="name" className={inputClass}
+                    />
                   </div>
-                )}
-
-                {submitStatus === 'error' && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
-                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-red-900">Error Sending Message</h4>
-                      <p className="text-sm text-red-700">{errorMessage}</p>
-                    </div>
+                  <div>
+                    <label className={labelClass}>Email *</label>
+                    <input
+                      type="email" name="email" value={formData.email}
+                      onChange={handleChange} placeholder="you@example.com"
+                      required autoComplete="email" className={inputClass}
+                    />
                   </div>
-                )}
+                </div>
 
-                <form className="space-y-6" onSubmit={handleSubmit}>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                      <input type="text" name="name" value={formData.name} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
-                      <input type="email" name="email" value={formData.email} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
-                    </div>
+                {/* Phone + Subject */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className={labelClass}>Phone</label>
+                    <input
+                      type="tel" name="phone" value={formData.phone}
+                      onChange={handleChange} placeholder="+254 700 000 000"
+                      autoComplete="tel" className={inputClass}
+                    />
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                      <input type="tel" name="phone" value={formData.phone} onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent" />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
-                      <select name="subject" value={formData.subject} onChange={handleChange}
-                        required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent">
-                        <option value="">Select a subject</option>
-                        <option value="General Inquiry">General Inquiry</option>
-                        <option value="Corporate Law">Corporate Law</option>
-                        <option value="Litigation">Litigation & Dispute Resolution</option>
-                        <option value="Real Estate">Real Estate & Conveyancing</option>
-                        <option value="Employment Law">Employment & Labour Law</option>
-                        <option value="Family Law">Family & Succession Law</option>
-                        <option value="Criminal Law">Criminal Law</option>
-                        <option value="Other">Other</option>
+                  <div>
+                    <label className={labelClass}>Subject *</label>
+                    <div className="relative">
+                      <select
+                        name="subject" value={formData.subject}
+                        onChange={handleChange} required
+                        className={`${inputClass} appearance-none pr-9`}
+                      >
+                        <option value="">Select a subject…</option>
+                        {[
+                          'General Inquiry',
+                          'Corporate Law',
+                          'Litigation & Dispute Resolution',
+                          'Real Estate & Conveyancing',
+                          'Employment & Labour Law',
+                          'Family & Succession Law',
+                          'Criminal Law',
+                          'Other',
+                        ].map((s) => <option key={s} value={s}>{s}</option>)}
                       </select>
+                      <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                        <svg className="h-4 w-4 text-[#6a6a6a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
+                </div>
 
+                {/* Message */}
+                <div>
+                  <label className={labelClass}>Message *</label>
+                  <textarea
+                    name="message" value={formData.message}
+                    onChange={handleChange} rows={5} required
+                    placeholder="Please describe your legal matter…"
+                    className={`${inputClass} resize-none`}
+                  />
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm sm:text-base py-3 sm:py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin h-4 w-4 border-2 border-white/40 border-t-white rounded-full" />
+                      <span>Sending…</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="h-4 w-4" />
+                      <span>Send Message</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Status banners */}
+              {submitStatus === 'success' && (
+                <div className="mt-4 flex items-start gap-3 bg-[#bfa06f]/8 border border-[#bfa06f]/30 rounded-xl px-4 py-3">
+                  <CheckCircle className="h-4 w-4 text-[#bfa06f] mt-0.5 flex-shrink-0" />
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Message *</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange}
-                      rows={6} required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#bfa06f] focus:border-transparent resize-none"></textarea>
+                    <p className="text-xs font-semibold text-[#1a1a1a]">Message sent successfully</p>
+                    <p className="text-[0.65rem] text-[#4a4a4a] mt-0.5">We'll get back to you as soon as possible.</p>
                   </div>
-
-                  <button type="submit" disabled={isSubmitting}
-                    className="w-full bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2 disabled:opacity-50">
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Sending...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-5 w-5" />
-                        <span>Send Message</span>
-                      </>
-                    )}
+                </div>
+              )}
+              {submitStatus === 'error' && (
+                <div className="mt-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-red-800">Failed to send message</p>
+                    <p className="text-[0.65rem] text-red-700 mt-0.5">{errorMessage}</p>
+                  </div>
+                  <button
+                    onClick={() => setSubmitStatus('idle')}
+                    className="flex-shrink-0 flex items-center gap-1 text-[0.65rem] font-semibold text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Retry
                   </button>
-
-                </form>
-              </div>
-            </div>
-
-          </div>
-
-          {/* ⭐ UPDATED MAP SECTION ⭐ */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="p-6 bg-gradient-to-r from-[#bfa06f] to-[#a08a5f]">
-              <h2 className="text-2xl font-bold text-white">Find Us</h2>
-              <p className="text-white/90 mt-1">Visit our office</p>
-            </div>
-
-            <div className="relative w-full h-96">
-              <iframe
-                title="Office Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.820262983408!2d36.81541707534238!3d-1.2993107356429749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d9103a4f51%3A0xf8f3addf8df84972!2sUpper%20Hill%20Gardens%2C%20Ragati%20Rd%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske"
-                className="w-full h-full border-0"
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
+                </div>
+              )}
             </div>
           </div>
-
         </div>
       </div>
 
