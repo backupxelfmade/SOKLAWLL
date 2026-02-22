@@ -60,7 +60,7 @@ const ServicesPage = () => {
 
           {/* ── Loading skeleton ── */}
           {loading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
@@ -70,8 +70,7 @@ const ServicesPage = () => {
               ))}
             </div>
           ) : (
-            /* ── Services grid ── */
-            <div className="grid grid-cols-2 lg:grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
               {services.map((service: any) => (
                 <div
                   key={service.id}
@@ -94,10 +93,10 @@ const ServicesPage = () => {
                     style={{ backgroundImage: `url(${service.header_image || service.headerImage})` }}
                   />
 
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5 group-hover:from-black/75 transition-all duration-500" />
+                  {/* Lighter gradient — less black, more image visible */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent group-hover:from-black/65 transition-all duration-500" />
 
-                  {/* Arrow chip — top right */}
+                  {/* Arrow chip */}
                   <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 lg:top-5 lg:right-5">
                     <div className="flex items-center justify-center rounded-full bg-[#bfa06f] group-hover:bg-white transition-colors duration-300 shadow-md
                       w-7 h-7 sm:w-9 sm:h-9 lg:w-11 lg:h-11">
@@ -109,28 +108,35 @@ const ServicesPage = () => {
                   {/* Card content */}
                   <div className="absolute inset-0 flex flex-col justify-end p-2.5 sm:p-5 lg:p-7">
                     {/* Gold rule */}
-                    <div className="h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300
+                    <div className="h-0.5 bg-[#d4b483] mb-1.5 sm:mb-2.5 transition-all duration-300
                       w-3 sm:w-5 group-hover:w-5 sm:group-hover:w-8" />
 
-                    <h3 className="text-white font-bold leading-tight
-                      text-[0.65rem] sm:text-lg lg:text-2xl xl:text-3xl
-                      line-clamp-2 sm:line-clamp-none">
+                    {/* Title — bright white with text shadow for legibility */}
+                    <h3
+                      className="font-bold leading-tight text-white
+                        text-[0.65rem] sm:text-lg lg:text-2xl xl:text-3xl
+                        line-clamp-2 sm:line-clamp-none"
+                      style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
+                    >
                       {service.title}
                     </h3>
 
                     {/* Excerpt — desktop hover only */}
                     {service.excerpt && (
-                      <p className="hidden sm:block text-white/0 group-hover:text-white/75
-                        text-xs sm:text-sm leading-relaxed mt-1.5 max-w-sm
-                        max-h-0 group-hover:max-h-12 overflow-hidden
-                        transition-all duration-300">
+                      <p
+                        className="hidden sm:block text-white/0 group-hover:text-white
+                          text-xs sm:text-sm leading-relaxed mt-1.5 max-w-sm
+                          max-h-0 group-hover:max-h-12 overflow-hidden
+                          transition-all duration-300"
+                        style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
+                      >
                         {service.excerpt}
                       </p>
                     )}
                   </div>
 
                   {/* Gold border on hover */}
-                  <div className="absolute inset-0 rounded-xl sm:rounded-3xl border border-transparent group-hover:border-[#bfa06f]/30 transition-all duration-300 pointer-events-none" />
+                  <div className="absolute inset-0 rounded-xl sm:rounded-3xl border border-transparent group-hover:border-[#bfa06f]/40 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}
             </div>
