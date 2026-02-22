@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Phone, Linkedin, Award, BookOpen, Users, Scale, ArrowLeft } from 'lucide-react';
+import { X, Mail, Phone, Linkedin, Award, BookOpen, Users, Scale, ArrowLeft, ArrowRight } from 'lucide-react';
 import { teamMembers, TeamMember } from '../data/teamData';
 
 interface TeamDirectoryProps {
@@ -12,158 +12,157 @@ const TeamDirectory: React.FC<TeamDirectoryProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleMemberClick = (member: TeamMember) => {
-    setSelectedMember(member);
-  };
-
-  const handleBackToDirectory = () => {
-    setSelectedMember(null);
-  };
-
   const handleClose = () => {
     setSelectedMember(null);
     onClose();
   };
 
+  // ── Member detail view ──
   if (selectedMember) {
     return (
-      <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 backdrop-blur-sm">
-        <div className="min-h-screen px-4 py-8">
-          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl">
-            {/* Header */}
-            <div className="relative p-6 border-b border-gray-200">
+      <div
+        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-y-auto"
+        onClick={() => setSelectedMember(null)}
+      >
+        <div className="min-h-screen px-3 sm:px-6 py-6 sm:py-10 flex items-start justify-center">
+          <div
+            className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Hero strip */}
+            <div className="relative">
+              <img
+                src={selectedMember.image}
+                alt={selectedMember.name}
+                className="w-full h-40 sm:h-64 object-cover object-top"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+              {/* Nav buttons */}
               <button
-                onClick={handleBackToDirectory}
-                className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-4 transition-colors"
+                onClick={() => setSelectedMember(null)}
+                className="absolute top-3 left-3 sm:top-4 sm:left-4 flex items-center gap-1.5 bg-black/40 hover:bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm transition-all duration-200"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Back to Team Directory
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Back</span>
               </button>
               <button
                 onClick={handleClose}
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-8 h-8 flex items-center justify-center bg-black/40 hover:bg-black/60 text-white rounded-full backdrop-blur-sm transition-all duration-200"
               >
-                <X className="h-6 w-6" />
+                <X className="h-4 w-4" />
               </button>
+
+              {/* Name overlay */}
+              <div className="absolute bottom-4 left-4 sm:left-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="block h-px w-5 bg-[#bfa06f]" />
+                  <span className="text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                    {selectedMember.category || 'Partner'}
+                  </span>
+                </div>
+                <h2 className="text-lg sm:text-2xl font-bold text-white leading-tight">
+                  {selectedMember.name}
+                </h2>
+                <p className="text-[#bfa06f] font-semibold text-xs sm:text-base">
+                  {selectedMember.role}
+                </p>
+              </div>
             </div>
 
-            {/* Member Profile */}
-            <div className="p-8">
-              <div className="grid lg:grid-cols-3 gap-8">
-                {/* Profile Image and Basic Info */}
-                <div className="lg:col-span-1">
-                  <div className="text-center">
-                    <img
-                      src={selectedMember.image}
-                      alt={selectedMember.name}
-                      className="w-48 h-48 rounded-full mx-auto mb-6 object-cover shadow-lg"
-                    />
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedMember.name}</h2>
-                    <p className="text-lg font-semibold text-yellow-600 mb-2">{selectedMember.role}</p>
-                    <p className="text-gray-600 mb-6">{selectedMember.specialization}</p>
-                    
-                    {/* Contact Info */}
-                    <div className="space-y-3">
-                      <a
-                        href={`mailto:${selectedMember.email}`}
-                        className="flex items-center justify-center space-x-2 text-gray-600 hover:text-yellow-600 transition-colors"
-                      >
-                        <Mail className="h-4 w-4" />
-                        <span className="text-sm">{selectedMember.email}</span>
-                      </a>
-                      <a
-                        href={`tel:${selectedMember.phone}`}
-                        className="flex items-center justify-center space-x-2 text-gray-600 hover:text-yellow-600 transition-colors"
-                      >
-                        <Phone className="h-4 w-4" />
-                        <span className="text-sm">{selectedMember.phone}</span>
-                      </a>
+            {/* Body */}
+            <div className="px-4 sm:px-8 py-5 sm:py-8 space-y-5 sm:space-y-7">
+
+              {/* Contact row */}
+              <div className="flex items-center gap-2 pb-5 border-b border-[#e8e0d0]">
+                <a
+                  href={`mailto:${selectedMember.email}`}
+                  className="flex items-center gap-2 text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors group"
+                >
+                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#f9f7f1] group-hover:bg-[#bfa06f] group-hover:text-white transition-all duration-200">
+                    <Mail className="h-3.5 w-3.5" />
+                  </span>
+                  <span className="hidden sm:inline">{selectedMember.email}</span>
+                </a>
+                <a
+                  href={`tel:${selectedMember.phone}`}
+                  className="flex items-center gap-2 text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors group"
+                >
+                  <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#f9f7f1] group-hover:bg-[#bfa06f] group-hover:text-white transition-all duration-200">
+                    <Phone className="h-3.5 w-3.5" />
+                  </span>
+                  <span className="hidden sm:inline">{selectedMember.phone}</span>
+                </a>
+              </div>
+
+              {/* Two-col on desktop */}
+              <div className="grid sm:grid-cols-2 gap-5 sm:gap-8">
+
+                {/* Left col */}
+                <div className="space-y-5">
+                  <InfoBlock title="About">
+                    <p className="text-[#4a4a4a] text-sm leading-relaxed">{selectedMember.description}</p>
+                  </InfoBlock>
+
+                  <InfoBlock title="Experience">
+                    <p className="text-[#4a4a4a] text-sm">{selectedMember.experience}</p>
+                  </InfoBlock>
+
+                  <InfoBlock title="Languages">
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedMember.languages.map((lang, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-[#bfa06f]/10 text-[#8b7355] text-xs font-medium rounded-full">
+                          {lang}
+                        </span>
+                      ))}
                     </div>
-                  </div>
+                  </InfoBlock>
                 </div>
 
-                {/* Detailed Information */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Description */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">About</h3>
-                    <p className="text-gray-600 leading-relaxed">{selectedMember.description}</p>
-                  </div>
-
-                  {/* Experience */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Experience</h3>
-                    <p className="text-gray-600">{selectedMember.experience}</p>
-                  </div>
-
-                  {/* Expertise */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Areas of Expertise</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember.expertise.map((area, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium"
-                        >
+                {/* Right col */}
+                <div className="space-y-5">
+                  <InfoBlock title="Areas of Expertise">
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedMember.expertise.map((area, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-[#bfa06f]/10 text-[#8b7355] text-xs font-medium rounded-full">
                           {area}
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </InfoBlock>
 
-                  {/* Education */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Education</h3>
+                  <InfoBlock title="Education">
                     <ul className="space-y-2">
-                      {selectedMember.education.map((edu, index) => (
-                        <li key={index} className="text-gray-600 flex items-start">
-                          <BookOpen className="h-4 w-4 mt-1 mr-2 text-yellow-600 flex-shrink-0" />
+                      {selectedMember.education.map((edu, i) => (
+                        <li key={i} className="flex items-start gap-2 text-[#4a4a4a] text-sm">
+                          <BookOpen className="h-3.5 w-3.5 mt-0.5 text-[#bfa06f] flex-shrink-0" />
                           {edu}
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </InfoBlock>
 
-                  {/* Admissions */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Professional Admissions</h3>
+                  <InfoBlock title="Admissions">
                     <ul className="space-y-2">
-                      {selectedMember.admissions.map((admission, index) => (
-                        <li key={index} className="text-gray-600 flex items-start">
-                          <Scale className="h-4 w-4 mt-1 mr-2 text-yellow-600 flex-shrink-0" />
-                          {admission}
+                      {selectedMember.admissions.map((adm, i) => (
+                        <li key={i} className="flex items-start gap-2 text-[#4a4a4a] text-sm">
+                          <Scale className="h-3.5 w-3.5 mt-0.5 text-[#bfa06f] flex-shrink-0" />
+                          {adm}
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </InfoBlock>
 
-                  {/* Achievements */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Key Achievements</h3>
+                  <InfoBlock title="Key Achievements">
                     <ul className="space-y-2">
-                      {selectedMember.achievements.map((achievement, index) => (
-                        <li key={index} className="text-gray-600 flex items-start">
-                          <Award className="h-4 w-4 mt-1 mr-2 text-yellow-600 flex-shrink-0" />
-                          {achievement}
+                      {selectedMember.achievements.map((ach, i) => (
+                        <li key={i} className="flex items-start gap-2 text-[#4a4a4a] text-sm">
+                          <Award className="h-3.5 w-3.5 mt-0.5 text-[#bfa06f] flex-shrink-0" />
+                          {ach}
                         </li>
                       ))}
                     </ul>
-                  </div>
-
-                  {/* Languages */}
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">Languages</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedMember.languages.map((language, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                        >
-                          {language}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                  </InfoBlock>
                 </div>
               </div>
             </div>
@@ -173,49 +172,72 @@ const TeamDirectory: React.FC<TeamDirectoryProps> = ({ isOpen, onClose }) => {
     );
   }
 
+  // ── Directory view ──
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 backdrop-blur-sm">
-      <div className="min-h-screen px-4 py-8">
-        <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm overflow-y-auto"
+      onClick={handleClose}
+    >
+      <div className="min-h-screen px-3 sm:px-6 py-6 sm:py-10 flex items-start justify-center">
+        <div
+          className="w-full max-w-5xl bg-[#f9f7f1] rounded-2xl shadow-2xl overflow-hidden"
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
-          <div className="relative p-6 border-b border-gray-200">
-            <h2 className="text-3xl font-bold text-gray-900">Our Legal Team</h2>
-            <p className="text-gray-600 mt-2">Meet our experienced team of legal professionals</p>
+          <div className="bg-white px-4 sm:px-8 py-5 sm:py-6 border-b border-[#e8e0d0] flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="block h-px w-5 bg-[#bfa06f]" />
+                <span className="text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                  The Firm
+                </span>
+              </div>
+              <h2 className="text-lg sm:text-2xl font-bold text-[#1a1a1a]">Our Legal Team</h2>
+              <p className="text-xs sm:text-sm text-[#6a6a6a] mt-0.5">
+                Meet our experienced team of legal professionals
+              </p>
+            </div>
             <button
               onClick={handleClose}
-              className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-[#f9f7f1] hover:bg-[#e8e0d0] text-[#4a4a4a] transition-all duration-200 flex-shrink-0 mt-1"
             >
-              <X className="h-6 w-6" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Team Grid */}
-          <div className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Grid */}
+          <div className="p-3 sm:p-6 lg:p-8">
+            <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 lg:gap-5">
               {teamMembers.map((member) => (
                 <div
                   key={member.id}
-                  onClick={() => handleMemberClick(member)}
-                  className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1"
+                  onClick={() => setSelectedMember(member)}
+                  className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer hover:-translate-y-0.5"
                 >
-                  <div className="text-center">
+                  {/* Portrait */}
+                  <div className="aspect-[3/4] sm:aspect-[4/5] overflow-hidden bg-[#e8e0d0]">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-24 h-24 rounded-full mx-auto mb-4 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{member.name}</h3>
-                    <p className="text-sm font-semibold text-yellow-600 mb-2">{member.role}</p>
-                    <p className="text-sm text-gray-600 mb-3">{member.specialization}</p>
-                    <p className="text-xs text-gray-500">{member.experience}</p>
-                    
-                    {/* Qualifications */}
-                    <div className="mt-3 flex flex-wrap justify-center gap-1">
-                      {member.qualifications.slice(0, 2).map((qual, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                        >
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-2 sm:p-4">
+                    <div className="w-3 sm:w-4 h-0.5 bg-[#bfa06f] mb-1 sm:mb-2" />
+                    <h3 className="font-bold text-[#1a1a1a] leading-tight line-clamp-1
+                      text-[0.6rem] sm:text-sm md:text-base">
+                      {member.name}
+                    </h3>
+                    <p className="text-[#bfa06f] font-semibold leading-tight line-clamp-1
+                      text-[0.55rem] sm:text-xs mt-0.5">
+                      {member.role}
+                    </p>
+                    {/* Qualifications — desktop only */}
+                    <div className="hidden sm:flex flex-wrap gap-1 mt-2">
+                      {member.qualifications?.slice(0, 2).map((qual, i) => (
+                        <span key={i} className="px-1.5 py-0.5 bg-[#f9f7f1] text-[#6a6a6a] text-[10px] rounded font-medium">
                           {qual}
                         </span>
                       ))}
@@ -230,5 +252,15 @@ const TeamDirectory: React.FC<TeamDirectoryProps> = ({ isOpen, onClose }) => {
     </div>
   );
 };
+
+// ── Reusable section block ──
+const InfoBlock = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div>
+    <h4 className="text-[0.7rem] font-bold uppercase tracking-widest text-[#1a1a1a] mb-2">
+      {title}
+    </h4>
+    {children}
+  </div>
+);
 
 export default TeamDirectory;
