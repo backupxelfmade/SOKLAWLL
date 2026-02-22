@@ -54,9 +54,9 @@ const News = () => {
 
   const formatDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
       month: 'short',
       day: 'numeric',
+      year: 'numeric',
     });
 
   return (
@@ -64,7 +64,7 @@ const News = () => {
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
 
         {/* ── Section header ── */}
-        <div className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <div className="mb-6 sm:mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
@@ -77,7 +77,6 @@ const News = () => {
             </h2>
           </div>
 
-          {/* Desktop "View All" */}
           {!isLoading && !error && posts.length > 0 && (
             <button
               onClick={handleViewAllClick}
@@ -102,18 +101,18 @@ const News = () => {
 
         {/* ── Error ── */}
         {error && !isLoading && (
-          <div className="py-10 flex justify-center">
-            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center">
-              <div className="flex items-center justify-center w-11 h-11 rounded-full bg-red-100 mx-auto mb-4">
-                <AlertCircle className="h-5 w-5 text-red-500" />
+          <div className="py-8 flex justify-center">
+            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-5 max-w-sm w-full text-center">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 mx-auto mb-3">
+                <AlertCircle className="h-4 w-4 text-red-500" />
               </div>
               <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">Unable to Load Posts</h3>
-              <p className="text-xs text-[#6a6a6a] mb-5 leading-relaxed">{error}</p>
+              <p className="text-xs text-[#6a6a6a] mb-4 leading-relaxed">{error}</p>
               <button
                 onClick={() => { setError(null); window.location.reload(); }}
-                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-xs font-semibold px-5 py-2.5 rounded-full transition-colors duration-200 mx-auto"
+                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-xs font-semibold px-5 py-2 rounded-full transition-colors duration-200 mx-auto"
               >
-                <RefreshCw className="h-3.5 w-3.5" />
+                <RefreshCw className="h-3 w-3" />
                 <span>Try Again</span>
               </button>
             </div>
@@ -122,22 +121,23 @@ const News = () => {
 
         {/* ── Empty ── */}
         {!isLoading && !error && posts.length === 0 && (
-          <div className="py-10 flex justify-center">
-            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center">
+          <div className="py-8 flex justify-center">
+            <div className="bg-[#f9f7f1] border border-[#e8e0d0] rounded-2xl p-5 max-w-sm w-full text-center">
               <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">No Posts Yet</h3>
               <p className="text-xs text-[#6a6a6a]">Check back later for new content.</p>
             </div>
           </div>
         )}
 
-        {/* ── Posts grid ── */}
+        {/* ── Posts ── */}
         {!isLoading && !error && posts.length > 0 && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
+            {/* Mobile — stacked list rows */}
+            <div className="flex flex-col divide-y divide-[#e8e0d0] sm:hidden">
               {posts.map((post) => (
                 <article
                   key={post.id}
-                  className="news-card opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  className="news-card opacity-0 flex items-start gap-3 py-3 cursor-pointer group"
                   onClick={() => handleArticleClick(post)}
                   role="button"
                   tabIndex={0}
@@ -149,7 +149,64 @@ const News = () => {
                   }}
                   aria-label={`Read article: ${post.title}`}
                 >
-                  {/* Featured image */}
+                  {/* Thumbnail */}
+                  {post.featuredImage ? (
+                    <div className="w-20 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-[#e8e0d0]">
+                      <img
+                        src={post.featuredImage.src}
+                        alt={post.featuredImage.title || post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-16 flex-shrink-0 rounded-lg bg-[#bfa06f]/10 flex items-center justify-center">
+                      <span className="text-[#bfa06f] text-lg font-black">
+                        {post.title.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="w-3 h-0.5 bg-[#bfa06f] mb-1" />
+                    <h3 className="text-xs font-bold text-[#1a1a1a] leading-snug line-clamp-2 group-hover:text-[#bfa06f] transition-colors duration-200 mb-1">
+                      {post.title}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      {post.publishedDate && (
+                        <div className="flex items-center gap-1 text-[#6a6a6a]">
+                          <Calendar className="h-2.5 w-2.5" />
+                          <span className="text-[0.6rem]">{formatDate(post.publishedDate)}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-0.5 text-[#bfa06f] text-[0.6rem] font-semibold">
+                        <span>Read</span>
+                        <ArrowRight className="h-2.5 w-2.5 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Desktop — card grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+              {posts.map((post) => (
+                <article
+                  key={post.id}
+                  className="news-card opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  onClick={() => handleArticleClick(post)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleArticleClick(post);
+                    }
+                  }}
+                  aria-label={`Read article: ${post.title}`}
+                >
                   {post.featuredImage && (
                     <div className="aspect-video overflow-hidden bg-[#e8e0d0]">
                       <img
@@ -160,46 +217,32 @@ const News = () => {
                       />
                     </div>
                   )}
-
-                  {/* Card body */}
-                  <div className="p-3.5 sm:p-5">
-                    {/* Gold rule */}
-                    <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-2 sm:mb-3 transition-all duration-300 group-hover:w-6 sm:group-hover:w-8" />
-
-                    {/* Title */}
-                    <h3 className="font-bold text-[#1a1a1a] leading-snug line-clamp-2 mb-1.5 sm:mb-2
-                      text-sm sm:text-base lg:text-lg group-hover:text-[#bfa06f] transition-colors duration-200">
+                  <div className="p-5">
+                    <div className="w-5 h-0.5 bg-[#bfa06f] mb-3 transition-all duration-300 group-hover:w-8" />
+                    <h3 className="font-bold text-[#1a1a1a] leading-snug line-clamp-2 mb-2
+                      text-base lg:text-lg group-hover:text-[#bfa06f] transition-colors duration-200">
                       {post.title}
                     </h3>
-
-                    {/* Excerpt — desktop only */}
-                    <p className="hidden sm:block text-[#6a6a6a] text-sm leading-relaxed line-clamp-3 mb-4">
+                    <p className="text-[#6a6a6a] text-sm leading-relaxed line-clamp-3 mb-4">
                       {post.excerpt}
                     </p>
-
-                    {/* Meta row */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0">
                         {post.publishedDate && (
                           <div className="flex items-center gap-1 text-[#6a6a6a]">
                             <Calendar className="h-3 w-3 flex-shrink-0" />
-                            <span className="text-[0.6rem] sm:text-xs truncate">
-                              {formatDate(post.publishedDate)}
-                            </span>
+                            <span className="text-xs truncate">{formatDate(post.publishedDate)}</span>
                           </div>
                         )}
                         {post.author && (
-                          <div className="hidden sm:flex items-center gap-1 text-[#6a6a6a]">
+                          <div className="flex items-center gap-1 text-[#6a6a6a]">
                             <User className="h-3 w-3 flex-shrink-0" />
                             <span className="text-xs truncate">{post.author}</span>
                           </div>
                         )}
                       </div>
-
-                      {/* Read more */}
-                      <div className="flex items-center gap-1 text-[#bfa06f] font-semibold flex-shrink-0
-                        text-[0.6rem] sm:text-xs group-hover:gap-1.5 transition-all duration-200">
-                        <span>Read</span>
+                      <div className="flex items-center gap-1 text-[#bfa06f] text-xs font-semibold flex-shrink-0 group-hover:gap-1.5 transition-all duration-200">
+                        <span>Read more</span>
                         <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
@@ -209,13 +252,13 @@ const News = () => {
             </div>
 
             {/* Mobile "View All" */}
-            <div className="mt-6 flex justify-center sm:hidden">
+            <div className="mt-5 flex justify-center sm:hidden">
               <button
                 onClick={handleViewAllClick}
-                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-md transition-all duration-200 group w-full max-w-xs"
+                className="flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-md transition-all duration-200 w-full max-w-xs"
               >
                 <span>View All Posts</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </>
@@ -227,7 +270,7 @@ const News = () => {
           animation: fadeInUp 0.5s ease-out forwards;
         }
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(16px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         .line-clamp-2 {
