@@ -33,7 +33,7 @@ const schemaMarkup = {
   '@context': 'https://schema.org',
   '@type': 'LegalService',
   name: 'SOK Law Associates',
-  alternateName: 'Simiyu, Opondo, Kiranga & Co. Advocates',
+  alternateName: 'Simiyu, Opondo, Kiranga & Advocates',
   description: 'Leading Nairobi law firm providing expert legal representation in litigation, corporate law, real estate, family law, and 14 other practice areas since 2009.',
   url: 'https://soklaw.co.ke',
   telephone: '+254205285048',
@@ -110,7 +110,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      aria-label="SOK Law Associates — Nairobi's trusted legal representation"
+      aria-label="SOKLaw Advocates — Nairobi's trusted legal representation"
       className="relative w-full overflow-hidden flex flex-col justify-end"
       style={{ height: '100svh', minHeight: '580px', maxHeight: '960px' }}
     >
