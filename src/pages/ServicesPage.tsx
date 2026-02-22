@@ -21,45 +21,50 @@ const ServicesPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-white pt-20 sm:pt-24">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-14 lg:py-20">
+      <div className="min-h-screen bg-white">
 
-          {/* ── Back button ── */}
-          <button
-            onClick={handleBackToHome}
-            className="group inline-flex items-center gap-2 text-[0.7rem] sm:text-sm font-semibold text-[#4a4a4a] hover:text-[#bfa06f] transition-colors duration-200 mb-5 sm:mb-12"
-          >
-            <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            Back
-          </button>
+        {/* ── Dark header band ── */}
+        <div className="bg-[#0d2340] pt-24 sm:pt-28 pb-8 sm:pb-14">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
 
-          {/* ── Section header ── */}
-          <div className="mb-5 sm:mb-14">
+            {/* Back button */}
+            <button
+              onClick={handleBackToHome}
+              className="group inline-flex items-center gap-2 text-[0.7rem] sm:text-sm font-semibold text-white/50 hover:text-white transition-colors duration-200 mb-6 sm:mb-10"
+            >
+              <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              Back
+            </button>
+
+            {/* Header text */}
             <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
               <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
                 What We Do
               </span>
             </div>
-            {/* Navy blue heading matching screenshot */}
-            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#0d2340] leading-tight">
+            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
               Our Legal Services
             </h1>
-            <p className="text-sm sm:text-base text-[#4a4a4a] max-w-xl mt-3 leading-relaxed">
+            <p className="text-sm sm:text-base text-white/60 max-w-xl mt-3 leading-relaxed">
               Comprehensive legal solutions across a broad range of practice areas—expert
               representation tailored to your needs.
             </p>
           </div>
+        </div>
 
-          {/* ── Error banner ── */}
+        {/* ── Cards section ── */}
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-12 lg:py-16">
+
+          {/* Error banner */}
           {error && (
-            <div className="flex items-start gap-3 bg-white border border-[#e8e0d0] rounded-xl px-3 py-2.5 mb-4 sm:mb-8 max-w-lg">
+            <div className="flex items-start gap-3 bg-[#f9f7f1] border border-[#e8e0d0] rounded-xl px-3 py-2.5 mb-4 sm:mb-8 max-w-lg">
               <AlertCircle className="h-3.5 w-3.5 text-[#bfa06f] mt-0.5 flex-shrink-0" />
               <p className="text-xs text-[#4a4a4a]">Displaying default services. {error}</p>
             </div>
           )}
 
-          {/* ── Loading skeleton ── */}
+          {/* Loading skeleton */}
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-5 lg:gap-6">
               {[...Array(6)].map((_, i) => (
@@ -108,11 +113,8 @@ const ServicesPage = () => {
 
                   {/* Card content */}
                   <div className="absolute inset-0 flex flex-col justify-end p-2.5 sm:p-5 lg:p-7">
-                    {/* Gold rule */}
                     <div className="h-0.5 bg-[#d4b483] mb-1.5 sm:mb-2.5 transition-all duration-300
                       w-3 sm:w-5 group-hover:w-5 sm:group-hover:w-8" />
-
-                    {/* Title */}
                     <h3
                       className="font-bold leading-tight text-white
                         text-[0.65rem] sm:text-lg lg:text-2xl xl:text-3xl
@@ -121,8 +123,6 @@ const ServicesPage = () => {
                     >
                       {service.title}
                     </h3>
-
-                    {/* Excerpt — desktop hover only */}
                     {service.excerpt && (
                       <p
                         className="hidden sm:block text-white/0 group-hover:text-white
@@ -136,7 +136,6 @@ const ServicesPage = () => {
                     )}
                   </div>
 
-                  {/* Gold border on hover */}
                   <div className="absolute inset-0 rounded-xl sm:rounded-3xl border border-transparent group-hover:border-[#bfa06f]/40 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}
