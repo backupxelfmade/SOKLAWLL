@@ -4,24 +4,16 @@ import { Users, Award, Clock, TrendingUp } from 'lucide-react';
 const About = () => {
   const sectionRef = useRef<HTMLElement>(null);
 
-  // Easing function for smoother animation
   const easeOutQuad = (t: number) => t * (2 - t);
 
   const animateCount = (el: HTMLElement, target: number, suffix = '', duration = 2500) => {
-    const start = 0;
     const startTime = performance.now();
-
     const step = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = easeOutQuad(Math.min(elapsed / duration, 1));
-      const value = Math.floor(progress * (target - start) + start);
-      el.innerText = `${value}${suffix}`;
-
-      if (progress < 1) {
-        requestAnimationFrame(step);
-      }
+      el.innerText = `${Math.floor(progress * target)}${suffix}`;
+      if (progress < 1) requestAnimationFrame(step);
     };
-
     requestAnimationFrame(step);
   };
 
@@ -31,21 +23,14 @@ const About = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const targetEl = entry.target;
-          const elements = targetEl.querySelectorAll('.animate-on-scroll');
-          const counters = targetEl.querySelectorAll('.count-up');
+          const elements = entry.target.querySelectorAll('.animate-on-scroll');
+          const counters = entry.target.querySelectorAll('.count-up');
 
           if (entry.isIntersecting && !hasAnimated) {
             hasAnimated = true;
-
-            // Animate text and image elements
-            elements.forEach((element, index) => {
-              setTimeout(() => {
-                element.classList.add('animate-fade-in-up');
-              }, index * 200);
+            elements.forEach((el, i) => {
+              setTimeout(() => el.classList.add('animate-fade-in-up'), i * 150);
             });
-
-            // Animate counters on scroll into view
             counters.forEach((counter) => {
               const countTo = Number(counter.getAttribute('data-count-to'));
               const suffix = counter.getAttribute('data-suffix') || '';
@@ -55,111 +40,125 @@ const About = () => {
 
           if (!entry.isIntersecting) {
             hasAnimated = false;
-            counters.forEach((counter) => {
-              (counter as HTMLElement).innerText = '0';
-            });
+            counters.forEach((c) => { (c as HTMLElement).innerText = '0'; });
           }
         });
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   const stats = [
-    { icon: Clock, label: 'Years of Experience', value: 15, suffix: '+', color: 'text-blue-600' },
-    { icon: Award, label: 'Cases Won', value: 500, suffix: '+', color: 'text-green-600' },
-    { icon: Users, label: 'Satisfied Clients', value: 1000, suffix: '+', color: 'text-purple-600' },
-    { icon: TrendingUp, label: 'Success Rate (%)', value: 98, suffix: '%', color: 'text-orange-600' },
+    { icon: Clock,      label: 'Years of Experience', value: 15,   suffix: '+' },
+    { icon: Award,      label: 'Cases Won',            value: 500,  suffix: '+' },
+    { icon: Users,      label: 'Satisfied Clients',    value: 1000, suffix: '+' },
+    { icon: TrendingUp, label: 'Success Rate',         value: 98,   suffix: '%' },
   ];
 
   return (
-    <section ref={sectionRef} id="about" className="py-20 brand-section-light">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="animate-on-scroll opacity-0 text-4xl md:text-5xl font-bold mb-6">
+    <section ref={sectionRef} id="about" className="py-20 sm:py-28 bg-[#f9f7f1]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+
+        {/* ── Section header ── */}
+        <div className="mb-14 sm:mb-18">
+          <div className="animate-on-scroll opacity-0 flex items-center gap-3 mb-4">
+            <span className="block h-px w-8 bg-[#bfa06f]" />
+            <span className="text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+              Who We Are
+            </span>
+          </div>
+          <h2 className="animate-on-scroll opacity-0 text-3xl sm:text-4xl md:text-5xl font-bold text-[#1a1a1a] leading-tight max-w-xl">
             About SOK Law Associates
           </h2>
-          <div className="animate-on-scroll opacity-0 w-24 h-1 bg-gradient-to-r from-yellow-600 to-yellow-500 mx-auto"></div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Image */}
+        {/* ── Two-column layout ── */}
+        <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-center">
+
+          {/* ── Image col ── */}
           <div className="animate-on-scroll opacity-0 relative">
+            {/* Decorative frame */}
+            <div className="absolute -inset-3 rounded-3xl border border-[#bfa06f]/20 pointer-events-none" />
+            <div className="absolute -bottom-4 -right-4 w-2/3 h-2/3 rounded-3xl bg-[#bfa06f]/8 pointer-events-none" />
+
             <img
               loading="lazy"
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
-              alt="SOK Law Associates Team"
-              className="about-img shadow-2xl transform hover:scale-105 transition-transform duration-500 rounded-2xl w-full h-auto"
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center center',
-                maxHeight: '500px'
-              }}
+              alt="SOK Law Associates"
+              className="relative w-full rounded-2xl object-cover object-center shadow-xl"
+              style={{ maxHeight: '520px' }}
               onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                if (target.parentElement) {
-                  target.parentElement.style.background = 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%)';
-                  target.parentElement.style.minHeight = '400px';
-                  target.parentElement.style.display = 'flex';
-                  target.parentElement.style.alignItems = 'center';
-                  target.parentElement.style.justifyContent = 'center';
-                  
-                  const placeholder = document.createElement('div');
-                  placeholder.className = 'text-white text-6xl font-bold';
-                  placeholder.textContent = 'SOK';
-                  target.parentElement.appendChild(placeholder);
+                const t = e.target as HTMLImageElement;
+                t.style.display = 'none';
+                if (t.parentElement) {
+                  t.parentElement.style.background = 'linear-gradient(135deg, #bfa06f 0%, #8b7355 100%)';
+                  t.parentElement.style.minHeight = '400px';
+                  t.parentElement.style.borderRadius = '1rem';
                 }
               }}
             />
-            <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full opacity-20"></div>
-            <div className="absolute -top-6 -left-6 w-16 h-16 bg-gradient-to-br from-blue-800 to-blue-900 rounded-full opacity-20"></div>
+
+            {/* Floating badge */}
+            <div className="absolute -bottom-5 left-6 sm:left-10 bg-white rounded-2xl shadow-lg px-5 py-3 flex items-center gap-3 border border-[#e8e0d0]">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#bfa06f]/10">
+                <Award className="h-4 w-4 text-[#bfa06f]" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#1a1a1a]">Est. 2009</p>
+                <p className="text-[10px] text-gray-400 leading-tight">15+ years of practice</p>
+              </div>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="space-y-8">
-            <div className="animate-on-scroll opacity-0">
-              <h3 className="text-2xl font-bold mb-4">
+          {/* ── Content col ── */}
+          <div className="space-y-8 pt-6 lg:pt-0">
+
+            {/* Body copy */}
+            <div className="animate-on-scroll opacity-0 space-y-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#1a1a1a]">
                 Excellence in Legal Practice Since 2009
               </h3>
-              <p className="text-lg leading-relaxed mb-6">
+              <p className="text-[#4a4a4a] leading-relaxed text-sm sm:text-base">
                 SOK Law Associates has been at the forefront of legal practice in Kenya,
                 providing comprehensive legal solutions to individuals, corporations, and
-                institutions. Our commitment to excellence, integrity, and client satisfaction
-                has made us one of the most trusted law firms in the region.
+                institutions. Our commitment to excellence, integrity, and client
+                satisfaction has made us one of the most trusted law firms in the region.
               </p>
-              <p className="text-lg leading-relaxed">
+              <p className="text-[#4a4a4a] leading-relaxed text-sm sm:text-base">
                 We combine deep legal expertise with innovative approaches to deliver
-                outstanding results for our clients. Our team of experienced lawyers
-                specializes in various areas of law, ensuring that we can handle complex
-                legal matters with precision and professionalism.
+                outstanding results. Our experienced team specialises in a broad range
+                of practice areas, handling complex matters with precision and care.
               </p>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 gap-6">
-              {stats.map((stat, index) => {
-                const IconComponent = stat.icon;
+            {/* Divider */}
+            <div className="animate-on-scroll opacity-0 h-px w-full bg-[#e8e0d0]" />
+
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {stats.map((stat, i) => {
+                const Icon = stat.icon;
                 return (
                   <div
-                    key={index}
-                    className="animate-on-scroll opacity-0 modern-card p-6 transform hover:-translate-y-1"
+                    key={i}
+                    className="animate-on-scroll opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-2xl p-5 transition-all duration-200 hover:shadow-md"
                   >
-                    <IconComponent className={`h-8 w-8 ${stat.color} mb-3`} />
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#bfa06f]/10 group-hover:bg-[#bfa06f]/20 transition-colors duration-200">
+                        <Icon className="h-4 w-4 text-[#bfa06f]" />
+                      </div>
+                    </div>
                     <div
-                      className="text-2xl font-bold mb-1 count-up"
+                      className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] leading-none mb-1 count-up"
                       data-count-to={stat.value}
                       data-suffix={stat.suffix}
                     >
                       0
                     </div>
-                    <div className="text-sm">{stat.label}</div>
+                    <div className="text-xs text-gray-400 font-medium">{stat.label}</div>
                   </div>
                 );
               })}
