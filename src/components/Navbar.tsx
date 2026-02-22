@@ -1,30 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Menu, X, Scale } from 'lucide-react';
+import { Menu, X, Scale, ArrowRight } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -39,161 +19,229 @@ const Navbar = () => {
     { href: '/contact', label: 'Contact', isRoute: true },
   ];
 
-  const handleNavigation = useCallback((link: { href: string; isRoute: boolean }) => {
-    setIsOpen(false);
-
-    if (link.isRoute) {
-      navigate(link.href);
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    } else {
-      if (location.pathname !== '/') {
-        navigate('/');
-        setTimeout(() => {
-          const element = document.querySelector(link.href);
-          if (element) {
-            const headerOffset = 80;
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-          }
-        }, 100);
-      } else {
-        const element = document.querySelector(link.href);
-        if (element) {
-          const headerOffset = 80;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-        }
-      }
-    }
-  }, [navigate, location.pathname]);
-
-  // Close mobile menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (isOpen && !target.closest('nav')) {
-        setIsOpen(false);
-      }
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
+  const handleNavigation = useCallback(
+    (link: { href: string; isRoute: boolean }) => {
+      setIsOpen(false);
+      if (link.isRoute) {
+        navigate(link.href);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else {
+        const scrollToEl = () => {
+          const el = document.querySelector(link.href);
+          if (!el) return;
+          window.scrollTo({
+            top: el.getBoundingClientRect().top + window.pageYOffset - 80,
+            behavior: 'smooth',
+          });
+        };
+        if (location.pathname !== '/') {
+          navigate('/');
+          setTimeout(scrollToEl, 100);
+        } else {
+          scrollToEl();
+        }
+      }
+    },
+    [navigate, location.pathname]
+  );
+
+  const isActiveLink = (href: string) =>
+    href === '/' ? location.pathname === '/' : location.pathname === href;
+
   return (
-    <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-[#f9f7f1]/95 backdrop-blur-md shadow-lg'
-          : 'bg-transparent'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16 md:h-20">
-          {/* Logo and Firm Name */}
-          <div className="flex flex-col space-y-1 py-2 flex-shrink-0">
+    <>
+      <nav
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-[#f9f7f1]/95 backdrop-blur-md shadow-sm'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex justify-between items-center h-16 sm:h-18 md:h-20">
+
+            {/* ── Logo ── */}
             <Link
               to="/"
-              className="flex items-center space-x-1 sm:space-x-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+              className="flex flex-col gap-0.5 flex-shrink-0 group"
             >
-              <Scale className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-yellow-600 flex-shrink-0" />
-              <img
-                src="https://soklaw.co.ke/images/logo.png"
-                alt="SOK Law Logo"
-                className="h-8 sm:h-9 md:h-10 w-auto object-contain transition-all duration-300"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
+              <div className="flex items-center gap-2">
+                <Scale
+                  className={`h-5 w-5 sm:h-6 sm:w-6 transition-colors duration-300 ${
+                    isScrolled ? 'text-[#bfa06f]' : 'text-[#bfa06f]'
+                  }`}
+                />
+                <img
+                  src="https://soklaw.co.ke/images/logo.png"
+                  alt="SOK Law"
+                  className="h-7 sm:h-8 md:h-9 w-auto object-contain"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
+              <p
+                className={`text-[7px] sm:text-[8px] md:text-[9px] font-semibold tracking-[0.15em] uppercase leading-tight transition-colors duration-300 ${
+                  isScrolled ? 'text-[#7a6245]' : 'text-white/70'
+                }`}
+              >
+                Simiyu, Opondo, Kiranga & Co. Advocates
+              </p>
             </Link>
-            <p className={`text-[8px] sm:text-[9px] md:text-[10px] lg:text-xs font-semibold tracking-wide leading-tight transition-colors duration-300 ${
-              isScrolled ? 'text-[#4B3621]' : 'text-white'
-            }`}>
-              SIMIYU, OPONDO, KIRANGA & COMPANY ADVOCATES
-            </p>
-          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-4 lg:ml-6 xl:ml-10 flex items-baseline space-x-2 lg:space-x-4 xl:space-x-8">
+            {/* ── Desktop Links ── */}
+            <div className="hidden md:flex items-center gap-1 lg:gap-2">
               {navLinks.map((link) => (
                 <button
                   key={link.href}
                   onClick={() => handleNavigation(link)}
-                  className={`px-1 lg:px-2 xl:px-3 py-2 text-xs lg:text-sm xl:text-base font-medium transition-colors duration-200 hover:text-yellow-600 relative group ${
-                    isScrolled ? 'text-gray-700' : 'text-white'
+                  className={`relative px-2 lg:px-3 py-1.5 text-xs lg:text-sm font-medium rounded-md transition-all duration-200 group ${
+                    isActiveLink(link.href)
+                      ? isScrolled
+                        ? 'text-[#bfa06f]'
+                        : 'text-[#bfa06f]'
+                      : isScrolled
+                      ? 'text-gray-600 hover:text-[#bfa06f]'
+                      : 'text-white/85 hover:text-white'
                   }`}
                 >
                   {link.label}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-yellow-600 transition-all duration-300 group-hover:w-full"></span>
+                  {/* Animated underline */}
+                  <span
+                    className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-px bg-[#bfa06f] transition-all duration-300 ${
+                      isActiveLink(link.href)
+                        ? 'w-4/5'
+                        : 'w-0 group-hover:w-4/5'
+                    }`}
+                  />
                 </button>
               ))}
-            </div>
-          </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex-shrink-0">
+              {/* Desktop CTA */}
+              <button
+                onClick={() => handleNavigation({ href: '/contact', isRoute: true })}
+                className="ml-3 lg:ml-4 flex items-center gap-1.5 bg-[#bfa06f] hover:bg-[#a08a5f] text-white text-xs lg:text-sm font-semibold px-4 lg:px-5 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 group"
+              >
+                <span>Get in Touch</span>
+                <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            </div>
+
+            {/* ── Mobile Hamburger ── */}
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsOpen(!isOpen);
-              }}
-              className={`p-2 rounded-md transition-colors duration-200 relative z-50 ${
-                !isScrolled && !isOpen
-                  ? 'text-white hover:bg-white/10 bg-black/20'
-                  : 'text-gray-700 hover:bg-gray-100 bg-white/90'
-              }`}
+              onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={isOpen}
-              style={{ 
-                minWidth: '32px',
-                minHeight: '32px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
+              className={`md:hidden relative z-50 flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${
+                isScrolled || isOpen
+                  ? 'bg-white/90 text-gray-700 shadow-sm'
+                  : 'bg-white/10 text-white backdrop-blur-sm'
+              }`}
             >
-              {isOpen ? <X className="h-5 w-5 sm:h-6 sm:w-6" /> : <Menu className="h-5 w-5 sm:h-6 sm:w-6" />}
+              <span
+                className={`absolute transition-all duration-200 ${
+                  isOpen ? 'opacity-100 rotate-0' : 'opacity-0 rotate-90'
+                }`}
+              >
+                <X className="h-5 w-5" />
+              </span>
+              <span
+                className={`absolute transition-all duration-200 ${
+                  isOpen ? 'opacity-0 -rotate-90' : 'opacity-100 rotate-0'
+                }`}
+              >
+                <Menu className="h-5 w-5" />
+              </span>
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile Navigation */}
-      <div className={`md:hidden fixed inset-x-0 top-14 sm:top-16 transition-all duration-300 ease-in-out z-40 ${
-        isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-      }`}>
-        <div className="bg-[#f9f7f1]/95 backdrop-blur-md border-t border-gray-200 shadow-lg">
-          <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-4 sm:pb-6 space-y-1 sm:space-y-2 max-h-[calc(100vh-3.5rem)] sm:max-h-[calc(100vh-4rem)] overflow-y-auto">
-            {navLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => handleNavigation(link)}
-                className="block px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-medium text-gray-700 hover:text-yellow-600 hover:bg-white/50 rounded-lg transition-all duration-200 w-full cursor-pointer active:bg-yellow-100 text-left"
-              >
-                {link.label}
-              </button>
-            ))}
+      {/* ── Mobile Drawer ── */}
+      {/* Backdrop */}
+      <div
+        onClick={() => setIsOpen(false)}
+        className={`fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      {/* Slide-in panel */}
+      <div
+        className={`fixed top-0 right-0 h-full w-[75vw] max-w-[320px] z-50 md:hidden
+          bg-[#f9f7f1] shadow-2xl
+          flex flex-col
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+        `}
+      >
+        {/* Panel header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#e8e0d0]">
+          <div className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-[#bfa06f]" />
+            <span className="text-[9px] font-semibold tracking-widest uppercase text-[#7a6245]">
+              SOK Law
+            </span>
           </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-[#e8e0d0] text-gray-600 hover:bg-[#bfa06f] hover:text-white transition-all duration-200"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-1">
+          {navLinks.map((link, i) => (
+            <button
+              key={link.href}
+              onClick={() => handleNavigation(link)}
+              style={{ transitionDelay: isOpen ? `${i * 30}ms` : '0ms' }}
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
+                isActiveLink(link.href)
+                  ? 'bg-[#bfa06f]/10 text-[#bfa06f]'
+                  : 'text-gray-700 hover:bg-[#bfa06f]/10 hover:text-[#bfa06f]'
+              }`}
+            >
+              <span>{link.label}</span>
+              <ArrowRight
+                className={`h-3.5 w-3.5 transition-all duration-200 ${
+                  isActiveLink(link.href)
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0'
+                }`}
+              />
+            </button>
+          ))}
+        </nav>
+
+        {/* Panel footer CTA */}
+        <div className="px-5 py-5 border-t border-[#e8e0d0]">
+          <button
+            onClick={() => handleNavigation({ href: '/contact', isRoute: true })}
+            className="w-full flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm px-5 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-200 group"
+          >
+            <span>Book a Consultation</span>
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+          <p className="text-center text-[10px] text-gray-400 mt-3">
+            Confidential, no-obligation consultation
+          </p>
         </div>
       </div>
-
-      {/* Mobile menu overlay */}
-      {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-30 top-14 sm:top-16"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-    </nav>
+    </>
   );
 };
 
