@@ -29,7 +29,7 @@ const Hero = () => {
   // Preload images
   useEffect(() => {
     const loadImages = async () => {
-      const imagePromises = slides.map((slide, index) => {
+      const imagePromises = slides.map((slide) => {
         return new Promise<boolean>((resolve) => {
           const img = new Image();
           img.onload = () => resolve(true);
@@ -47,10 +47,10 @@ const Hero = () => {
 
   // Auto-rotate slides
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-
+    const timer = setInterval(
+      () => setCurrentSlide((prev) => (prev + 1) % slides.length),
+      5000
+    );
     return () => clearInterval(timer);
   }, [slides.length]);
 
@@ -133,11 +133,11 @@ const Hero = () => {
           </div>
 
           {/* Dark overlay for contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/55 to-black/75" />
         </div>
       ))}
 
-      {/* Slide click areas (kept but reduced height on mobile) */}
+      {/* Slide click areas */}
       <button
         onClick={prevSlide}
         className="absolute left-0 top-0 w-1/2 h-full lg:h-[80%] z-10 opacity-0 cursor-pointer touch-manipulation"
@@ -162,11 +162,11 @@ const Hero = () => {
           className="
             max-w-3xl mx-auto
             text-center
-            py-16 sm:py-18 md:py-20
+            py-14 sm:py-16 md:py-20
             flex flex-col gap-6
           "
         >
-          {/* Badge / Eyebrow */}
+          {/* Badge */}
           <div className="inline-flex items-center justify-center gap-2 self-center bg-black/40 border border-white/20 text-xs sm:text-sm text-white/80 px-3 sm:px-4 py-1.5 rounded-full backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-[#bfa06f]" />
             <span>Toronto-Based Law Firm</span>
@@ -185,19 +185,21 @@ const Hero = () => {
               {slides[currentSlide].title}
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-white/80 max-w-xl mx-auto">
-              Strategic counsel for complex disputes, transactions, and regulatory matters—delivered with discretion and clarity.
+              Strategic legal guidance for complex disputes, business matters, and regulatory issues—delivered with clarity and discretion.
             </p>
           </div>
 
-          {/* CTA Row */}
+          {/* CTA cluster */}
           <div
             className="
-              flex flex-col sm:flex-row
-              gap-3 sm:gap-4
+              mt-3 sm:mt-5
+              flex flex-col items-stretch
+              sm:flex-row sm:items-center
               justify-center
-              mt-2 sm:mt-4
+              gap-3 sm:gap-4
             "
           >
+            {/* Primary CTA */}
             <button
               onClick={() => scrollToTarget('#contact')}
               className="
@@ -218,36 +220,41 @@ const Hero = () => {
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            <button
-              onClick={() => scrollToTarget('#services')}
+            {/* Secondary + microcopy as one block for modern look */}
+            <div
               className="
-                group
-                bg-white/5 hover:bg-white/15
-                border border-white/30
-                text-white font-medium
-                rounded-full
-                flex items-center justify-center gap-2
-                shadow-md hover:shadow-lg
-                backdrop-blur-sm
-                transition-all duration-200
-                text-sm sm:text-base
-                px-5 sm:px-7 py-3
+                flex flex-col sm:flex-row
+                items-stretch sm:items-center
+                gap-2 sm:gap-3
                 w-full sm:w-auto
               "
             >
-              <span>View Practice Areas</span>
-              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
+              <button
+                onClick={() => scrollToTarget('#services')}
+                className="
+                  group
+                  bg-white/5 hover:bg-white/15
+                  border border-white/30
+                  text-white font-medium
+                  rounded-full
+                  flex items-center justify-center gap-2
+                  shadow-md hover:shadow-lg
+                  backdrop-blur-sm
+                  transition-all duration-200
+                  text-sm sm:text-base
+                  px-5 sm:px-7 py-3
+                  w-full sm:w-auto
+                "
+              >
+                <span>View Practice Areas</span>
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+              </button>
 
-          {/* Secondary info (very compact) */}
-          <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm text-white/70 mt-2">
-            <span className="flex items-center gap-2">
-              <span className="h-1 w-6 bg-[#bfa06f]/80 rounded-full" />
-              24/7 case intake
-            </span>
-            <span className="hidden xs:inline text-white/30">•</span>
-            <span>Confidential, no‑obligation call</span>
+              {/* Small trust cue */}
+              <span className="text-[0.7rem] sm:text-xs text-white/65 text-center sm:text-left px-1">
+                Confidential, no‑obligation consultation.
+              </span>
+            </div>
           </div>
         </div>
       </div>
