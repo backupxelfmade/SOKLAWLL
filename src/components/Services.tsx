@@ -110,7 +110,7 @@ const Services = () => {
                   }}
                 />
 
-                {/* Strong gradient overlay for legibility */}
+                {/* Strong gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10 group-hover:from-black/95 transition-all duration-300" />
 
                 {/* Arrow chip */}
@@ -123,17 +123,10 @@ const Services = () => {
                 {/* Bottom content */}
                 <div className="absolute bottom-0 inset-x-0 z-10 p-3 sm:p-5 lg:p-6">
                   <div className="w-4 sm:w-5 h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300 group-hover:w-7 sm:group-hover:w-9" />
-                  <h3
-                    className="text-xs sm:text-base lg:text-xl font-bold leading-snug line-clamp-2"
-                    style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}
-                  >
+                  <h3 className="service-title text-xs sm:text-base lg:text-xl font-bold leading-snug line-clamp-2">
                     {service.title}
                   </h3>
-                  {/* "Learn more" — desktop hover reveal */}
-                  <div
-                    className="hidden sm:flex items-center gap-1.5 mt-2.5 text-xs font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200"
-                    style={{ color: '#bfa06f' }}
-                  >
+                  <div className="learn-more hidden sm:flex items-center gap-1.5 mt-2.5 text-xs font-semibold opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
                     <span>Learn more</span>
                     <ArrowRight className="h-3 w-3" />
                   </div>
@@ -171,6 +164,13 @@ const Services = () => {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        .service-card .service-title {
+          color: #ffffff !important;
+          text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+        }
+        .service-card .learn-more {
+          color: #bfa06f !important;
         }
       `}</style>
     </section>
