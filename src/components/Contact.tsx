@@ -1,261 +1,198 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 
-// Form validation rules
 const VALIDATION_RULES = {
   email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   phone: /^[\+]?[0-9\s\-\(\)]{10,}$/,
-  required: ['firstName', 'lastName', 'email', 'legalService', 'message']
+  required: ['firstName', 'lastName', 'email', 'legalService', 'message'],
 };
 
 const Contact = () => {
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    legalService: '',
-    message: ''
+    firstName: '', lastName: '', email: '',
+    phone: '', legalService: '', message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState('idle');
-  const [validationErrors, setValidationErrors] = useState({});
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error' | 'validation_error'>('idle');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const elements = entry.target.querySelectorAll('.animate-on-scroll');
-            elements.forEach((element, index) => {
-              setTimeout(() => {
-                element.classList.add('animate-fade-in-up');
-              }, index * 100);
+            entry.target.querySelectorAll('.animate-on-scroll').forEach((el, i) => {
+              setTimeout(() => el.classList.add('animate-fade-in-up'), i * 100);
             });
           }
         });
       },
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear validation error when user starts typing
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-    
-    // Clear submit status when user modifies form
-    if (submitStatus !== 'idle') {
-      setSubmitStatus('idle');
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (validationErrors[name])
+      setValidationErrors((prev) => ({ ...prev, [name]: '' }));
+    if (submitStatus !== 'idle') setSubmitStatus('idle');
   };
 
-  /**
-   * Validate form data before submission
-   */
   const validateForm = () => {
-    const errors = {};
-    
-    // Check required fields
-    VALIDATION_RULES.required.forEach(field => {
-      if (!formData[field] || formData[field].trim() === '') {
-        errors[field] = 'This field is required';
-      }
+    const errors: Record<string, string> = {};
+    VALIDATION_RULES.required.forEach((field) => {
+      if (!formData[field as keyof typeof formData]?.trim())
+        errors[field] = 'Required';
     });
-    
-    // Validate email format
-    if (formData.email && !VALIDATION_RULES.email.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-    
-    // Validate phone format (optional field)
-    if (formData.phone && !VALIDATION_RULES.phone.test(formData.phone)) {
-      errors.phone = 'Please enter a valid phone number';
-    }
-    
+    if (formData.email && !VALIDATION_RULES.email.test(formData.email))
+      errors.email = 'Invalid email address';
+    if (formData.phone && !VALIDATION_RULES.phone.test(formData.phone))
+      errors.phone = 'Invalid phone number';
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  /**
-   * Main form submission handler
-   */
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form before submission
-    if (!validateForm()) {
-      setSubmitStatus('validation_error');
-      return;
-    }
-    
+    if (!validateForm()) { setSubmitStatus('validation_error'); return; }
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    setValidationErrors({});
-
     try {
-      // Prepare email content
       const emailBody = `
-New Contact Form Submission from SOK Law Website
+New Contact Form Submission — SOK Law Website
 
-Contact Information:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name: ${formData.firstName} ${formData.lastName}
-Email: ${formData.email}
-Phone: ${formData.phone || 'Not provided'}
+Name:    ${formData.firstName} ${formData.lastName}
+Email:   ${formData.email}
+Phone:   ${formData.phone || 'Not provided'}
+Service: ${formData.legalService}
+Date:    ${new Date().toLocaleString()}
 
-Legal Service Requested:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${formData.legalService}
-
-Client Message:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Message:
 ${formData.message}
-
-Additional Information:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Submission Date: ${new Date().toLocaleString()}
-Source: Website Contact Form
-
-Please follow up with this client within 24 hours.
       `.trim();
-
-      const subject = `New Legal Consultation Request - ${formData.firstName} ${formData.lastName}`;
-      const mailtoUrl = `mailto:xelfmade3@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-      
-      // Open email client
-      window.location.href = mailtoUrl;
-      
+      const subject = `New Legal Consultation Request — ${formData.firstName} ${formData.lastName}`;
+      window.location.href = `mailto:Info@soklaw.co.ke?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       setSubmitStatus('success');
-      resetForm();
-
-    } catch (error) {
-      console.error('Form submission error:', error);
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', legalService: '', message: '' });
+      setValidationErrors({});
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  /**
-   * Reset form to initial state
-   */
-  const resetForm = () => {
-    setFormData({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      legalService: '',
-      message: ''
-    });
-    setValidationErrors({});
-  };
+  const inputClass = (field: string) =>
+    `w-full px-3.5 sm:px-4 py-2.5 sm:py-3 border rounded-xl text-sm sm:text-base text-[#1a1a1a] placeholder-[#aaa] bg-white transition-colors duration-200 outline-none focus:ring-0 ${
+      validationErrors[field]
+        ? 'border-red-400 focus:border-red-500'
+        : 'border-[#e8e0d0] focus:border-[#bfa06f]'
+    }`;
 
-  const officeInfo = [
-    {
-      city: 'Nairobi Office',
-      address: 'Upperhill Gardens, Block D11, 3rd Ngong Avenue\nMilimani Area opp Kenya National Library Service',
-      phone: '+254 700 123 456',
-      email: 'Info@soklaw.co.ke'
-    },
-  ];
+  const labelClass = 'block text-[0.7rem] sm:text-xs font-semibold uppercase tracking-widest text-[#4a4a4a] mb-1.5';
 
   return (
-    <section ref={sectionRef} id="contact" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="animate-on-scroll opacity-0 text-4xl md:text-5xl font-bold mb-6">
+    <section ref={sectionRef} id="contact" className="py-10 sm:py-20 lg:py-28 bg-[#f9f7f1]">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
+
+        {/* ── Section header ── */}
+        <div className="mb-8 sm:mb-14">
+          <div className="animate-on-scroll opacity-0 flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
+            <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+              Contact Us
+            </span>
+          </div>
+          <h2 className="animate-on-scroll opacity-0 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
             Get In Touch
           </h2>
-          <p className="animate-on-scroll opacity-0 text-xl max-w-3xl mx-auto">
-            Ready to discuss your legal needs? Contact us today for a consultation 
+          <p className="animate-on-scroll opacity-0 hidden sm:block text-base text-[#4a4a4a] max-w-xl mt-3 leading-relaxed">
+            Ready to discuss your legal needs? Contact us today for a consultation
             with our experienced legal team.
           </p>
-          <div className="animate-on-scroll opacity-0 w-24 h-1 bg-gradient-to-r from-yellow-600 to-yellow-500 mx-auto mt-6"></div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <div className="animate-on-scroll opacity-0">
-              <h3 className="text-2xl font-bold mb-6">
-                Our Office Locations
-              </h3>
-              
-              {officeInfo.map((office, index) => (
-                <div key={index} className="mb-8 p-4 md:p-6 bg-gray-50 rounded-xl border hover:shadow-lg transition-shadow duration-300">
-                  <h4 className="text-xl font-semibold mb-4">
-                    {office.city}
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="h-5 w-5 mt-1 flex-shrink-0 text-yellow-600" />
-                      <p className="whitespace-pre-line text-sm md:text-base">
-                        {office.address}
-                      </p>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Phone className="h-5 w-5 flex-shrink-0 text-yellow-600" />
-                      <a href={`tel:${office.phone}`} className="transition-colors hover:text-yellow-600 text-sm md:text-base">
-                        {office.phone}
-                      </a>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="h-5 w-5 flex-shrink-0 text-yellow-600" />
-                      <a href={`mailto:${office.email}`} className="transition-colors hover:text-yellow-600 text-sm md:text-base">
-                        {office.email}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 items-start">
 
-            <div className="animate-on-scroll opacity-0 p-4 md:p-6 bg-yellow-50 rounded-xl border border-yellow-200">
-              <h4 className="text-xl font-semibold mb-4 flex items-center text-yellow-800">
-                <Clock className="h-5 w-5 mr-2 text-yellow-600" />
-                Business Hours
-              </h4>
-              <div className="space-y-2 text-yellow-700 text-sm md:text-base">
-                <div className="flex justify-between">
-                  <span>Monday - Friday</span>
-                  <span>8:00 AM - 6:00 PM</span>
+          {/* ── Left col — info ── */}
+          <div className="space-y-4 sm:space-y-5">
+
+            {/* Office card */}
+            <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+              <h3 className="text-sm sm:text-base font-bold text-[#1a1a1a] mb-4 flex items-center gap-2">
+                <span className="block h-px w-4 bg-[#bfa06f]" />
+                Nairobi Office
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0 mt-0.5">
+                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#4a4a4a] leading-relaxed whitespace-pre-line">
+                    {'Upperhill Gardens, Block D11, 3rd Ngong Avenue\nMilimani Area opp Kenya National Library Service'}
+                  </p>
                 </div>
-                <div className="flex justify-between">
-                  <span>Saturday</span>
-                  <span>9:00 AM - 2:00 PM</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0">
+                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                  </div>
+                  <a
+                    href="tel:+254700123456"
+                    className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
+                  >
+                    +254 700 123 456
+                  </a>
                 </div>
-                <div className="flex justify-between">
-                  <span>Sunday</span>
-                  <span>Emergency Only</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0">
+                    <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                  </div>
+                  <a
+                    href="mailto:Info@soklaw.co.ke"
+                    className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
+                  >
+                    Info@soklaw.co.ke
+                  </a>
                 </div>
               </div>
             </div>
 
-            <div className="animate-on-scroll opacity-0 mt-8 rounded-xl overflow-hidden shadow-lg border">
+            {/* Hours card */}
+            <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-6">
+              <h3 className="text-sm sm:text-base font-bold text-[#1a1a1a] mb-4 flex items-center gap-2">
+                <span className="block h-px w-4 bg-[#bfa06f]" />
+                Business Hours
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
+                  { day: 'Saturday',        hours: '9:00 AM – 2:00 PM' },
+                  { day: 'Sunday',          hours: 'Emergency Only' },
+                ].map(({ day, hours }) => (
+                  <div key={day} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-3 w-3 text-[#bfa06f] flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-[#4a4a4a]">{day}</span>
+                    </div>
+                    <span className="text-xs sm:text-sm font-semibold text-[#1a1a1a]">{hours}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Map */}
+            <div className="animate-on-scroll opacity-0 rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e0d0] shadow-sm">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.797776!2d36.7859!3d-1.2921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMTcnMzEuNiJTIDM2wrA0NycwOS4yIkU!5e0!3m2!1sen!2ske!4v1234567890"
                 width="100%"
-                height="300"
-                style={{ border: 0 }}
+                height="220"
+                style={{ border: 0, display: 'block' }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -264,243 +201,179 @@ Please follow up with this client within 24 hours.
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="animate-on-scroll opacity-0">
-            <div className="bg-white p-4 md:p-8 rounded-2xl shadow-xl border">
-              <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
-                Request a Consultation
-              </h3>
-              
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* First Name and Last Name Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      placeholder="Your first name"
-                      required
-                      autoComplete="given-name"
-                      className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                        validationErrors.firstName 
-                          ? 'border-red-500 focus:border-red-500' 
-                          : 'border-gray-200 focus:border-blue-500'
-                      }`}
-                    />
-                    {validationErrors.firstName && (
-                      <p className="text-red-500 text-sm mt-1">{validationErrors.firstName}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      placeholder="Your last name"
-                      required
-                      autoComplete="family-name"
-                      className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                        validationErrors.lastName 
-                          ? 'border-red-500 focus:border-red-500' 
-                          : 'border-gray-200 focus:border-blue-500'
-                      }`}
-                    />
-                    {validationErrors.lastName && (
-                      <p className="text-red-500 text-sm mt-1">{validationErrors.lastName}</p>
-                    )}
-                  </div>
-                </div>
+          {/* ── Right col — form ── */}
+          <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-8 shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="block h-px w-4 bg-[#bfa06f]" />
+              <span className="text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+                Consultation Request
+              </span>
+            </div>
+            <h3 className="text-base sm:text-xl font-bold text-[#1a1a1a] mb-5 sm:mb-7">
+              Send Us a Message
+            </h3>
 
-                {/* Email and Phone Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="your.email@example.com"
-                      required
-                      autoComplete="email"
-                      className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                        validationErrors.email 
-                          ? 'border-red-500 focus:border-red-500' 
-                          : 'border-gray-200 focus:border-blue-500'
-                      }`}
-                    />
-                    {validationErrors.email && (
-                      <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="+254 700 000 000"
-                      autoComplete="tel"
-                      className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors ${
-                        validationErrors.phone 
-                          ? 'border-red-500 focus:border-red-500' 
-                          : 'border-gray-200 focus:border-blue-500'
-                      }`}
-                    />
-                    {validationErrors.phone && (
-                      <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
-                    )}
-                  </div>
-                </div>
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
 
-                {/* Legal Service Required */}
+              {/* Name row */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Legal Service Required *
-                  </label>
+                  <label className={labelClass}>First Name *</label>
+                  <input
+                    type="text" name="firstName" value={formData.firstName}
+                    onChange={handleInputChange} placeholder="First name"
+                    autoComplete="given-name" className={inputClass('firstName')}
+                  />
+                  {validationErrors.firstName && (
+                    <p className="text-red-500 text-[0.65rem] mt-1">{validationErrors.firstName}</p>
+                  )}
+                </div>
+                <div>
+                  <label className={labelClass}>Last Name *</label>
+                  <input
+                    type="text" name="lastName" value={formData.lastName}
+                    onChange={handleInputChange} placeholder="Last name"
+                    autoComplete="family-name" className={inputClass('lastName')}
+                  />
+                  {validationErrors.lastName && (
+                    <p className="text-red-500 text-[0.65rem] mt-1">{validationErrors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Email + Phone row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>Email *</label>
+                  <input
+                    type="email" name="email" value={formData.email}
+                    onChange={handleInputChange} placeholder="you@example.com"
+                    autoComplete="email" className={inputClass('email')}
+                  />
+                  {validationErrors.email && (
+                    <p className="text-red-500 text-[0.65rem] mt-1">{validationErrors.email}</p>
+                  )}
+                </div>
+                <div>
+                  <label className={labelClass}>Phone</label>
+                  <input
+                    type="tel" name="phone" value={formData.phone}
+                    onChange={handleInputChange} placeholder="+254 700 000 000"
+                    autoComplete="tel" className={inputClass('phone')}
+                  />
+                  {validationErrors.phone && (
+                    <p className="text-red-500 text-[0.65rem] mt-1">{validationErrors.phone}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Service */}
+              <div>
+                <label className={labelClass}>Legal Service *</label>
+                <div className="relative">
                   <select
-                    name="legalService"
-                    value={formData.legalService}
+                    name="legalService" value={formData.legalService}
                     onChange={handleInputChange}
-                    required
-                    aria-label="Select legal service"
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors appearance-none bg-white pr-12 ${
-                      validationErrors.legalService 
-                        ? 'border-red-500 focus:border-red-500' 
-                        : 'border-gray-200 focus:border-blue-500'
-                    }`}
+                    className={`${inputClass('legalService')} appearance-none pr-9`}
                   >
-                    <option value="">Select a service</option>
-                    <option value="Civil and Criminal Litigation">Civil and Criminal Litigation</option>
-                    <option value="Alternative Dispute Resolution">Alternative Dispute Resolution</option>
-                    <option value="Commercial and Corporate Law">Commercial and Corporate Law</option>
-                    <option value="Bank Securities and Real Estate">Bank Securities and Real Estate</option>
-                    <option value="Employment Law">Employment Law</option>
-                    <option value="Family Law">Family Law</option>
-                    <option value="Energy Law">Energy Law</option>
-                    <option value="Construction Law">Construction Law</option>
-                    <option value="Health and Medical Law">Health and Medical Law</option>
-                    <option value="Finance and Banking Law">Finance and Banking Law</option>
-                    <option value="Insurance and Personal Injury">Insurance and Personal Injury</option>
-                    <option value="Agricultural Law">Agricultural Law</option>
-                    <option value="Legal Consultancy">Legal Consultancy</option>
-                    <option value="Other">Other</option>
+                    <option value="">Select a service…</option>
+                    {[
+                      'Civil and Criminal Litigation',
+                      'Alternative Dispute Resolution',
+                      'Commercial and Corporate Law',
+                      'Bank Securities and Real Estate',
+                      'Employment Law', 'Family Law', 'Energy Law',
+                      'Construction Law', 'Health and Medical Law',
+                      'Finance and Banking Law', 'Insurance and Personal Injury',
+                      'Agricultural Law', 'Legal Consultancy', 'Other',
+                    ].map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
-                  {validationErrors.legalService && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.legalService}</p>
-                  )}
+                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                    <svg className="h-4 w-4 text-[#6a6a6a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
-
-                {/* Message */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Message *
-                  </label>
-                  <textarea
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    placeholder="Please describe your legal matter and how we can help you..."
-                    required
-                    rows={5}
-                    maxLength={1000}
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition-colors resize-vertical ${
-                      validationErrors.message 
-                        ? 'border-red-500 focus:border-red-500' 
-                        : 'border-gray-200 focus:border-blue-500'
-                    }`}
-                  ></textarea>
-                  <div className="text-right text-xs text-gray-500 mt-1">
-                    {formData.message.length}/1000 characters
-                  </div>
-                  {validationErrors.message && (
-                    <p className="text-red-500 text-sm mt-1">{validationErrors.message}</p>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  aria-label={isSubmitting ? 'Sending message...' : 'Send message'}
-                  className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold py-4 px-6 rounded-xl hover:from-amber-700 hover:to-amber-800 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
-                >
-                  <Send className="w-4 h-4" />
-                  Send Message
-                </button>
-              </form>
-
-              {/* Status Messages */}
-              <div className="mt-4 space-y-3">
-                {/* Validation Error */}
-                {submitStatus === 'validation_error' && (
-                  <div className="bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-xl flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 mt-0.5 text-orange-600 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Please check your form</p>
-                      <p className="text-sm">All required fields must be completed with valid information.</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Success Message */}
-                {submitStatus === 'success' && (
-                  <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 mt-0.5 text-green-600 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Email client opened!</p>
-                      <p className="text-sm">Please send the email from your email client to complete your inquiry. We'll respond within 24 hours.</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Error Message */}
-                {submitStatus === 'error' && (
-                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 mt-0.5 text-red-600 flex-shrink-0" />
-                    <div>
-                      <p className="font-medium">Unable to open email client</p>
-                      <p className="text-sm">Please contact us directly at xelfmade3@gmail.com</p>
-                    </div>
-                  </div>
+                {validationErrors.legalService && (
+                  <p className="text-red-500 text-[0.65rem] mt-1">{validationErrors.legalService}</p>
                 )}
               </div>
-            </div>
+
+              {/* Message */}
+              <div>
+                <label className={labelClass}>Message *</label>
+                <textarea
+                  name="message" value={formData.message}
+                  onChange={handleInputChange} rows={4} maxLength={1000}
+                  placeholder="Please describe your legal matter…"
+                  className={`${inputClass('message')} resize-none`}
+                />
+                <div className="flex items-center justify-between mt-1">
+                  {validationErrors.message
+                    ? <p className="text-red-500 text-[0.65rem]">{validationErrors.message}</p>
+                    : <span />
+                  }
+                  <span className="text-[0.6rem] text-[#6a6a6a] ml-auto">
+                    {formData.message.length}/1000
+                  </span>
+                </div>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm sm:text-base py-3 sm:py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+              >
+                {isSubmitting
+                  ? <><span className="animate-spin h-4 w-4 border-2 border-white/40 border-t-white rounded-full" /><span>Sending…</span></>
+                  : <><Send className="h-4 w-4" /><span>Send Message</span></>
+                }
+              </button>
+            </form>
+
+            {/* Status banners */}
+            {submitStatus === 'validation_error' && (
+              <div className="mt-4 flex items-start gap-3 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+                <AlertCircle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-orange-800">Please check your form</p>
+                  <p className="text-[0.65rem] text-orange-700 mt-0.5">All required fields must be completed.</p>
+                </div>
+              </div>
+            )}
+            {submitStatus === 'success' && (
+              <div className="mt-4 flex items-start gap-3 bg-[#bfa06f]/8 border border-[#bfa06f]/30 rounded-xl px-4 py-3">
+                <CheckCircle className="h-4 w-4 text-[#bfa06f] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-[#1a1a1a]">Email client opened</p>
+                  <p className="text-[0.65rem] text-[#4a4a4a] mt-0.5">Please send the email to complete your inquiry. We'll respond within 24 hours.</p>
+                </div>
+              </div>
+            )}
+            {submitStatus === 'error' && (
+              <div className="mt-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-red-800">Unable to open email client</p>
+                  <p className="text-[0.65rem] text-red-700 mt-0.5">Please email us directly at Info@soklaw.co.ke</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
+
+      <style>{`
         .animate-on-scroll {
-          transition: all 0.6s ease-out;
-          transform: translateY(20px);
+          transform: translateY(16px);
+          transition: opacity 0.5s ease-out, transform 0.5s ease-out;
         }
-        
         .animate-fade-in-up {
           opacity: 1 !important;
           transform: translateY(0) !important;
         }
-        
-        /* Custom select arrow */
-        select {
-          background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23666'%3E%3Cpath d='M8 10.5L4 6.5h8z'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-        }
+        select option { color: #1a1a1a; }
       `}</style>
     </section>
   );
