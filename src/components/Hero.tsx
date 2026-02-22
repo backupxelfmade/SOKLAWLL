@@ -1,194 +1,352 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, Phone } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowRight, Phone, Shield, Clock, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const slides = [
+  {
+    image:          'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
+    position:       'center 30%',
+    mobilePosition: 'center 20%',
+    alt:            'SOK Law Associates senior advocates in Nairobi office',
+  },
+  {
+    image:          'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
+    position:       'center 30%',
+    mobilePosition: 'center 15%',
+    alt:            'SOK Law Associates legal team consultation session Nairobi',
+  },
+  {
+    image:          'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
+    position:       'center 50%',
+    mobilePosition: 'center 30%',
+    alt:            'SOK Law Associates advocates serving clients in Kenya',
+  },
+];
+
+const trustBadges = [
+  { icon: Shield,      text: 'Law Society of Kenya — Registered' },
+  { icon: Clock,       text: 'Response within 24 hours'          },
+  { icon: CheckCircle, text: 'Confidential & no obligation'      },
+];
+
+const schemaMarkup = {
+  '@context': 'https://schema.org',
+  '@type': 'LegalService',
+  name: 'SOK Law Associates',
+  alternateName: 'Simiyu, Opondo, Kiranga & Co. Advocates',
+  description: 'Leading Nairobi law firm providing expert legal representation in litigation, corporate law, real estate, family law, and 14 other practice areas since 2009.',
+  url: 'https://soklaw.co.ke',
+  telephone: '+254205285048',
+  email: 'Info@soklaw.co.ke',
+  foundingDate: '2009',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Upperhill Gardens, Block D11, 3rd Ngong Avenue',
+    addressLocality: 'Nairobi',
+    addressCountry: 'KE',
+  },
+  areaServed: { '@type': 'Country', name: 'Kenya' },
+  priceRange: '$$',
+};
+
+/* Stagger helper */
+const stagger = (i: number, base = 120) => ({
+  animationDelay: `${i * base}ms`,
+  animationFillMode: 'both' as const,
+});
 
 const Hero = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>([]);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(slides.map(() => false));
+  const [mounted, setMounted]           = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const slides = [
-    {
-      image: 'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
-      title: 'Expert Legal Representation',
-      position: 'center 30%',
-      mobilePosition: 'center 20%',
-    },
-    {
-      image: 'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
-      title: 'Comprehensive Legal Solutions',
-      position: 'center 30%',
-      mobilePosition: 'center 15%',
-    },
-    {
-      image: 'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
-      title: 'Your Trusted Legal Partner',
-      position: 'center 50%',
-      mobilePosition: 'center 30%',
-    },
-  ];
+  /* Trigger entrance animations after a single frame */
+  useEffect(() => { const t = setTimeout(() => setMounted(true), 80); return () => clearTimeout(t); }, []);
 
+  /* JSON-LD */
   useEffect(() => {
-    const loadImages = async () => {
-      const results = await Promise.all(
-        slides.map(
-          (slide) =>
-            new Promise<boolean>((resolve) => {
-              const img = new Image();
-              img.onload = () => resolve(true);
-              img.onerror = () => resolve(false);
-              img.src = slide.image;
-            })
-        )
-      );
-      setImagesLoaded(results);
-    };
-    loadImages();
+    const s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.text = JSON.stringify(schemaMarkup);
+    s.id   = 'sok-law-schema';
+    if (!document.getElementById('sok-law-schema')) document.head.appendChild(s);
+    return () => { document.getElementById('sok-law-schema')?.remove(); };
   }, []);
 
+  /* Preload */
   useEffect(() => {
-    const timer = setInterval(
-      () => setCurrentSlide((prev) => (prev + 1) % slides.length),
-      5000
+    slides.forEach((slide, i) => {
+      const img = new Image();
+      img.onload = () => setImagesLoaded(p => { const n = [...p]; n[i] = true; return n; });
+      img.src = slide.image;
+    });
+  }, []);
+
+  /* Auto-advance */
+  const startTimer = () => {
+    intervalRef.current = setInterval(
+      () => setCurrentSlide(p => (p + 1) % slides.length), 5500
     );
-    return () => clearInterval(timer);
-  }, [slides.length]);
+  };
+  useEffect(() => { startTimer(); return () => clearInterval(intervalRef.current!); }, []);
+
+  const goTo = (i: number) => {
+    clearInterval(intervalRef.current!);
+    setCurrentSlide(i);
+    startTimer();
+  };
 
   const scrollTo = (selector: string) => {
     const el = document.querySelector(selector);
     if (!el) return;
-    window.scrollTo({
-      top: el.getBoundingClientRect().top + window.pageYOffset - 80,
-      behavior: 'smooth',
-    });
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+  };
+
+  const handleConsultation = () => {
+    navigate('/contact');
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   return (
     <section
       id="home"
-      className="relative w-full overflow-hidden flex items-end"
-      style={{ height: '100svh', minHeight: '560px', maxHeight: '900px' }}
-      aria-label="Hero"
+      aria-label="SOK Law Associates — Nairobi's trusted legal representation"
+      className="relative w-full overflow-hidden flex flex-col justify-end"
+      style={{ height: '100svh', minHeight: '580px', maxHeight: '960px' }}
     >
-      {/* ── Background slides ── */}
+      {/* ── Background slides — Ken Burns on active ── */}
       {slides.map((slide, i) => (
         <div
           key={i}
           aria-hidden={i !== currentSlide}
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
             i === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {!imagesLoaded[i] && (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#bfa06f] to-[#8b7355] flex items-center justify-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white" />
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0d2340] to-[#1a3a5c]" />
           )}
           <img
             src={slide.image}
-            alt={slide.title}
-            className={`absolute inset-0 w-full h-full object-cover hero-img-${i}`}
+            alt={slide.alt}
+            className={`absolute inset-0 w-full h-full object-cover transition-none ${
+              i === currentSlide ? 'ken-burns' : ''
+            }`}
             style={{ objectPosition: slide.position }}
             loading={i === 0 ? 'eager' : 'lazy'}
-            onLoad={() =>
-              setImagesLoaded((prev) => {
-                const next = [...prev];
-                next[i] = true;
-                return next;
-              })
-            }
-            onError={(e) => {
-              const t = e.target as HTMLImageElement;
-              t.style.display = 'none';
-              if (t.parentElement)
-                t.parentElement.style.background =
-                  'linear-gradient(135deg,#bfa06f 0%,#8b7355 100%)';
-            }}
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-          <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/50 to-black/20" />
         </div>
       ))}
 
-      {/* ── Invisible tap zones ── */}
-      <button
-        onClick={() => setCurrentSlide((p) => (p - 1 + slides.length) % slides.length)}
-        className="absolute left-0 top-0 w-1/2 h-[80%] z-10 opacity-0 touch-manipulation"
-        aria-label="Previous slide"
-      />
-      <button
-        onClick={() => setCurrentSlide((p) => (p + 1) % slides.length)}
-        className="absolute right-0 top-0 w-1/2 h-[80%] z-10 opacity-0 touch-manipulation"
-        aria-label="Next slide"
-      />
+      {/* ── Overlays ── */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#040f1e]/80 via-[#040f1e]/40 to-[#040f1e]/20 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#040f1e]/40 via-transparent to-transparent z-10" />
+
+      {/* Tap zones */}
+      <button onClick={() => goTo((currentSlide - 1 + slides.length) % slides.length)}
+        className="absolute left-0 top-0 w-1/3 h-[75%] z-20 opacity-0 touch-manipulation" aria-label="Previous slide" />
+      <button onClick={() => goTo((currentSlide + 1) % slides.length)}
+        className="absolute right-0 top-0 w-1/3 h-[75%] z-20 opacity-0 touch-manipulation" aria-label="Next slide" />
 
       {/* ── Main content ── */}
-      <div className="relative z-20 w-full px-5 sm:px-8 lg:px-16 pb-14 sm:pb-16 md:pb-20">
-        <div className="max-w-2xl text-left mx-auto sm:mx-0">
+      <div className="relative z-30 w-full px-5 sm:px-10 lg:px-16 pb-14 sm:pb-18 lg:pb-24">
+        <div className="max-w-2xl">
 
-          {/* Eyebrow */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="block h-px w-6 bg-[#bfa06f]" />
-            <span className="text-[0.7rem] sm:text-xs font-semibold uppercase tracking-widest text-[#bfa06f]">
-              Nairobi-Based Law Firm
+          {/* Eyebrow — line draws in, text fades up */}
+          <div
+            className={`flex items-center gap-2.5 mb-5 sm:mb-6 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
+            style={stagger(0, 100)}
+          >
+            <span className={`block h-px bg-[#bfa06f] flex-shrink-0 ${mounted ? 'draw-line' : 'w-0'}`} />
+            <span className="text-[0.62rem] sm:text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[#bfa06f]">
+              Nairobi's Trusted Legal Advocates
             </span>
           </div>
 
-          {/* Heading */}
-          <h1
-            className="text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight mb-3 sm:mb-4"
-            style={{ textShadow: '0 4px 24px rgba(0,0,0,0.6)' }}
+          {/* H1 line 1 */}
+          <div
+            className={`overflow-hidden mb-1 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
+            style={stagger(1)}
           >
-            {slides[currentSlide].title}
-          </h1>
+            <h1
+              className="text-white font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12]"
+              style={{ textShadow: '0 2px 32px rgba(0,0,0,0.5)' }}
+            >
+              When the Stakes Are High,
+            </h1>
+          </div>
 
-          {/* Subheading */}
-          <p className="text-white/75 text-sm sm:text-base max-w-lg mb-7 sm:mb-8 leading-relaxed">
-            Strategic counsel for complex disputes, transactions, and regulatory
-            matters—delivered with precision and discretion.
+          {/* H1 line 2 — gold, slight extra delay */}
+          <div
+            className={`overflow-hidden mb-5 sm:mb-6 ${mounted ? 'hero-fade-up' : 'opacity-0'}`}
+            style={stagger(2)}
+          >
+            <h1
+              className="text-[#bfa06f] font-black text-[1.65rem] sm:text-4xl md:text-5xl lg:text-[3.4rem] leading-[1.12] gold-shimmer"
+              style={{ textShadow: '0 2px 32px rgba(0,0,0,0.5)' }}
+            >
+              You Need the Right Advocate.
+            </h1>
+          </div>
+
+          {/* Subtext */}
+          <p
+            className={`text-white/70 text-[0.8rem] sm:text-base md:text-lg max-w-lg leading-relaxed mb-3 sm:mb-4 ${
+              mounted ? 'hero-fade-up' : 'opacity-0'
+            }`}
+            style={{ ...stagger(3), textShadow: '0 1px 12px rgba(0,0,0,0.4)' }}
+          >
+            Don't navigate Kenya's legal system alone. SOK Law delivers
+            strategic, battle-tested representation across litigation,
+            corporate, real estate, family law, and more.
           </p>
 
-          {/* CTA row */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          {/* Micro social proof */}
+          <p
+            className={`text-[#bfa06f]/90 text-[0.65rem] sm:text-sm font-semibold tracking-wide mb-8 sm:mb-10 ${
+              mounted ? 'hero-fade-up' : 'opacity-0'
+            }`}
+            style={stagger(4)}
+          >
+            1,000+ clients protected &nbsp;·&nbsp; 98% success rate &nbsp;·&nbsp; 15 years in practice
+          </p>
+
+          {/* CTAs */}
+          <div
+            className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8 sm:mb-10 ${
+              mounted ? 'hero-fade-up' : 'opacity-0'
+            }`}
+            style={stagger(5)}
+          >
             <button
-              onClick={() => scrollTo('#contact')}
-              className="group flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm sm:text-base px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+              onClick={handleConsultation}
+              className="group flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-bold text-sm sm:text-[0.95rem] px-6 sm:px-8 py-3.5 rounded-full shadow-[0_4px_28px_rgba(191,160,111,0.38)] hover:shadow-[0_6px_36px_rgba(191,160,111,0.5)] transition-all duration-200"
             >
-              <Phone className="h-4 w-4" />
-              <span>Book a Consultation</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <span>Get a Free Consultation</span>
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
             </button>
-            <button
-              onClick={() => scrollTo('#services')}
-              className="group flex items-center justify-center sm:justify-start gap-2 border border-white/40 hover:border-white/70 hover:bg-white/10 text-white/90 hover:text-white font-medium text-sm sm:text-base px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-200"
+
+            <a
+              href="tel:+254205285048"
+              className="group flex items-center justify-center gap-2 border border-white/25 hover:border-white/55 hover:bg-white/10 text-white/80 hover:text-white font-semibold text-sm sm:text-[0.95rem] px-6 sm:px-8 py-3.5 rounded-full backdrop-blur-sm transition-all duration-200"
             >
-              <span>Practice Areas</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </button>
+              <Phone className="h-4 w-4 flex-shrink-0" />
+              <span>+254 (0) 20 5285048</span>
+            </a>
+          </div>
+
+          {/* Trust badges */}
+          <div
+            className={`flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6 ${
+              mounted ? 'hero-fade-up' : 'opacity-0'
+            }`}
+            style={stagger(6)}
+          >
+            {trustBadges.map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-1.5">
+                <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#bfa06f] flex-shrink-0" />
+                <span
+                  className="text-[0.58rem] sm:text-[0.7rem] text-white/55 font-medium"
+                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
+                >
+                  {text}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* ── Slide indicators ── */}
-      <div className="absolute bottom-5 z-30 flex items-center gap-1.5 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-8 lg:right-16 sm:bottom-6 lg:bottom-8">
+      {/* Slide indicators */}
+      <div className="absolute bottom-5 sm:bottom-7 right-5 sm:right-10 lg:right-16 z-30 flex items-center gap-1.5">
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => setCurrentSlide(i)}
+            onClick={() => goTo(i)}
             aria-label={`Slide ${i + 1}`}
             aria-current={i === currentSlide}
-            className={`h-1 rounded-full transition-all duration-300 ${
-              i === currentSlide
-                ? 'w-7 bg-[#bfa06f]'
-                : 'w-3 bg-white/40 hover:bg-white/70'
+            className={`h-[3px] rounded-full transition-all duration-300 ${
+              i === currentSlide ? 'w-7 bg-[#bfa06f]' : 'w-2.5 bg-white/30 hover:bg-white/55'
             }`}
           />
         ))}
       </div>
 
+      {/* Scroll cue */}
+      <div
+        className="absolute bottom-5 sm:bottom-7 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 opacity-35 hover:opacity-60 transition-opacity cursor-pointer"
+        onClick={() => scrollTo('#about')}
+      >
+        <span className="text-[0.48rem] text-white uppercase tracking-[0.22em] font-semibold">Scroll</span>
+        <div className="w-px h-5 sm:h-7 bg-white/40 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full bg-[#bfa06f] animate-scroll-line" style={{ height: '40%' }} />
+        </div>
+      </div>
+
       <style>{`
-        @media (max-width: 639px) {
-          .hero-img-0 { object-position: ${slides[0].mobilePosition} !important; }
-          .hero-img-1 { object-position: ${slides[1].mobilePosition} !important; }
-          .hero-img-2 { object-position: ${slides[2].mobilePosition} !important; }
+        /* ── Entrance: slide up + fade ── */
+        @keyframes heroFadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to   { opacity: 1; transform: translateY(0);    }
         }
+        .hero-fade-up {
+          animation: heroFadeUp 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* ── Gold rule draw-in ── */
+        @keyframes drawLine {
+          from { width: 0;    }
+          to   { width: 2.5rem; }
+        }
+        @media (min-width: 640px) {
+          @keyframes drawLine {
+            from { width: 0;      }
+            to   { width: 2.5rem; }
+          }
+        }
+        .draw-line {
+          animation: drawLine 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+        }
+
+        /* ── Gold headline shimmer sweep ── */
+        @keyframes shimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center;  }
+        }
+        .gold-shimmer {
+          background: linear-gradient(
+            105deg,
+            #bfa06f 0%,
+            #bfa06f 40%,
+            #e8c97a 50%,
+            #bfa06f 60%,
+            #bfa06f 100%
+          );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: shimmer 3s linear 1.2s 1 forwards;
+        }
+
+        /* ── Ken Burns on active slide ── */
+        @keyframes kenBurns {
+          from { transform: scale(1.06); }
+          to   { transform: scale(1.0);  }
+        }
+        .ken-burns {
+          animation: kenBurns 6s ease-out forwards;
+        }
+
+        /* ── Scroll cue ── */
+        @keyframes scrollLine {
+          0%   { transform: translateY(-100%); }
+          100% { transform: translateY(300%);  }
+        }
+        .animate-scroll-line { animation: scrollLine 1.8s ease-in-out infinite; }
       `}</style>
     </section>
   );
