@@ -48,11 +48,15 @@ const WhyChooseUs = () => {
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-2.5 sm:gap-3 lg:gap-4">
 
           {/* ── Card 1 — Large feature image ── */}
-          <div className="bento-card opacity-0 col-span-2 lg:col-span-5 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl min-h-[180px] sm:min-h-[320px] group cursor-default">
+          <div
+            className="bento-card opacity-0 col-span-2 lg:col-span-5 lg:row-span-2 relative overflow-hidden rounded-xl sm:rounded-2xl group cursor-default"
+            style={{ height: 'clamp(220px, 55vw, 520px)' }}
+          >
             <img
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
               alt="SOK Law Team"
-              className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              style={{ objectPosition: 'center 25%' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/10" />
             <div className="absolute inset-0 p-4 sm:p-7 flex flex-col justify-end">
@@ -131,7 +135,7 @@ const WhyChooseUs = () => {
             </div>
           </div>
 
-          {/* ── Card 5 — Personalised — spans full remaining row 2 width ── */}
+          {/* ── Card 5 — Personalised — full remaining width ── */}
           <div className="bento-card opacity-0 col-span-2 lg:col-span-7 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-3 sm:p-5 lg:p-6 group hover:border-[#bfa06f]/40 hover:shadow-md transition-all duration-300 cursor-default">
             <div className="flex items-start justify-between mb-3 sm:mb-5">
               <span className="text-[0.55rem] sm:text-xs font-semibold uppercase tracking-widest text-[#6a6a6a]">
