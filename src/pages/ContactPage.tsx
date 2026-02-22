@@ -1,113 +1,103 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import Footer from '../components/Footer';
 
+const VALIDATION_RULES = {
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  phone: /^[\+]?[0-9\s\-\(\)]{10,}$/,
+  required: ['firstName', 'lastName', 'email', 'legalService', 'message'],
+};
+
 const ContactPage = () => {
+  const bodyRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', subject: '', message: '',
+    firstName: '', lastName: '', email: '',
+    phone: '', legalService: '', message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error' | 'validation_error'>('idle');
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const handleChange = (
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.querySelectorAll('.animate-on-scroll').forEach((el, i) => {
+              setTimeout(() => el.classList.add('animate-fade-in-up'), i * 80);
+            });
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+    if (bodyRef.current) observer.observe(bodyRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (validationErrors[name])
+      setValidationErrors((prev) => ({ ...prev, [name]: '' }));
     if (submitStatus !== 'idle') setSubmitStatus('idle');
+  };
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    VALIDATION_RULES.required.forEach((field) => {
+      if (!formData[field as keyof typeof formData]?.trim())
+        errors[field] = 'Required';
+    });
+    if (formData.email && !VALIDATION_RULES.email.test(formData.email))
+      errors.email = 'Invalid email address';
+    if (formData.phone && !VALIDATION_RULES.phone.test(formData.phone))
+      errors.phone = 'Invalid phone number';
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) { setSubmitStatus('validation_error'); return; }
     setIsSubmitting(true);
     setSubmitStatus('idle');
-    setErrorMessage('');
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-contact-email`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (!response.ok) throw new Error('Failed to send message');
+      const emailBody = `
+New Contact Form Submission — SOK Law Website
+
+Name:    ${formData.firstName} ${formData.lastName}
+Email:   ${formData.email}
+Phone:   ${formData.phone || 'Not provided'}
+Service: ${formData.legalService}
+Date:    ${new Date().toLocaleString()}
+
+Message:
+${formData.message}
+      `.trim();
+      const subject = `New Legal Consultation Request — ${formData.firstName} ${formData.lastName}`;
+      window.location.href = `mailto:Info@soklaw.co.ke?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       setSubmitStatus('success');
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      setTimeout(() => setSubmitStatus('idle'), 6000);
-    } catch (err) {
-      console.error('Error sending message:', err);
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', legalService: '', message: '' });
+      setValidationErrors({});
+    } catch {
       setSubmitStatus('error');
-      setErrorMessage('Failed to send message. Please try again or contact us directly.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const inputClass =
-    'w-full px-3.5 sm:px-4 py-2.5 sm:py-3 border border-[#e8e0d0] focus:border-[#bfa06f] rounded-xl text-sm text-[#1a1a1a] placeholder-[#aaa] bg-white outline-none transition-colors duration-200';
+  const inputClass = (field: string) =>
+    `w-full px-3.5 sm:px-4 py-2.5 sm:py-3 border rounded-xl text-sm text-[#1a1a1a] placeholder-[#aaa] bg-white transition-colors duration-200 outline-none focus:ring-0 ${
+      validationErrors[field]
+        ? 'border-red-400 focus:border-red-500'
+        : 'border-[#e8e0d0] focus:border-[#bfa06f]'
+    }`;
 
   const labelClass =
     'block text-[0.65rem] sm:text-xs font-semibold uppercase tracking-widest text-[#4a4a4a] mb-1.5';
-
-  const infoItems = [
-    {
-      icon: MapPin,
-      label: 'Office Location',
-      content: (
-        <p className="text-xs sm:text-sm text-[#4a4a4a] leading-relaxed">
-          Upperhill Gardens, Block D11, 3rd Ngong Avenue<br />
-          Milimani Area opp Kenya National Library Service
-        </p>
-      ),
-    },
-    {
-      icon: Phone,
-      label: 'Phone',
-      content: (
-        <a
-          href="tel:+254205285048"
-          className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
-        >
-          +254 (0) 20 5285048
-        </a>
-      ),
-    },
-    {
-      icon: Mail,
-      label: 'Email',
-      content: (
-        <a
-          href="mailto:info@soklaw.co.ke"
-          className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors break-all"
-        >
-          info@soklaw.co.ke
-        </a>
-      ),
-    },
-    {
-      icon: Clock,
-      label: 'Office Hours',
-      content: (
-        <div className="space-y-1.5">
-          {[
-            { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
-            { day: 'Saturday',        hours: '9:00 AM – 2:00 PM' },
-            { day: 'Sunday',          hours: 'Emergency Only'     },
-          ].map(({ day, hours }) => (
-            <div key={day} className="flex items-center justify-between gap-4">
-              <span className="text-xs sm:text-sm text-[#4a4a4a]">{day}</span>
-              <span className="text-xs sm:text-sm font-semibold text-[#1a1a1a] flex-shrink-0">{hours}</span>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
@@ -129,41 +119,87 @@ const ContactPage = () => {
             Get In Touch
           </h1>
           <p className="text-[0.7rem] sm:text-sm text-white/50 max-w-md leading-relaxed">
-            Have a legal matter or question? We're here to help. Reach out and
-            we'll respond as soon as possible.
+            Ready to discuss your legal needs? Contact us today for a consultation
+            with our experienced legal team.
           </p>
         </div>
       </div>
 
       {/* ── Body ── */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-12">
+      <div ref={bodyRef} className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-12">
         <div className="grid lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-14 items-start">
 
           {/* ── Left col — info cards + map ── */}
           <div className="space-y-3 sm:space-y-4">
-            {infoItems.map(({ icon: Icon, label, content }) => (
-              <div
-                key={label}
-                className="bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:border-[#bfa06f]/40 hover:shadow-sm transition-all duration-200"
-              >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#bfa06f]/10 flex-shrink-0 mt-0.5">
-                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+
+            {/* Office card */}
+            <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-[#bfa06f]/40 hover:shadow-sm transition-all duration-200">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0d2340] mb-3 sm:mb-4 flex items-center gap-2">
+                <span className="block h-px w-4 bg-[#bfa06f] flex-shrink-0" />
+                Nairobi Office
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0 mt-0.5">
+                    <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#bfa06f]" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[0.6rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f] mb-1.5">
-                      {label}
-                    </p>
-                    {content}
+                  <p className="text-xs sm:text-sm text-[#4a4a4a] leading-relaxed">
+                    Upperhill Gardens, Block D11, 3rd Ngong Avenue<br />
+                    Milimani Area opp Kenya National Library Service
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0">
+                    <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#bfa06f]" />
                   </div>
+                  <a
+                    href="tel:+254205285048"
+                    className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors"
+                  >
+                    +254 (0) 20 5285048
+                  </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 flex-shrink-0">
+                    <Mail className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#bfa06f]" />
+                  </div>
+                  <a
+                    href="mailto:Info@soklaw.co.ke"
+                    className="text-xs sm:text-sm text-[#4a4a4a] hover:text-[#bfa06f] transition-colors break-all"
+                  >
+                    Info@soklaw.co.ke
+                  </a>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Hours card */}
+            <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:border-[#bfa06f]/40 hover:shadow-sm transition-all duration-200">
+              <h3 className="text-xs sm:text-sm font-bold text-[#0d2340] mb-3 sm:mb-4 flex items-center gap-2">
+                <span className="block h-px w-4 bg-[#bfa06f] flex-shrink-0" />
+                Business Hours
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { day: 'Monday – Friday', hours: '8:00 AM – 6:00 PM' },
+                  { day: 'Saturday',        hours: '9:00 AM – 2:00 PM' },
+                  { day: 'Sunday',          hours: 'Emergency Only' },
+                ].map(({ day, hours }) => (
+                  <div key={day} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-[#bfa06f] flex-shrink-0" />
+                      <span className="text-xs sm:text-sm text-[#4a4a4a]">{day}</span>
+                    </div>
+                    <span className="text-xs sm:text-sm font-semibold text-[#0d2340] flex-shrink-0">{hours}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Map */}
-            <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e0d0]">
+            <div className="animate-on-scroll opacity-0 rounded-xl sm:rounded-2xl overflow-hidden border border-[#e8e0d0]">
               <iframe
-                title="Office Map"
+                title="SOK Law Office Location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.820262983408!2d36.81541707534238!3d-1.2993107356429749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d9103a4f51%3A0xf8f3addf8df84972!2sUpper%20Hill%20Gardens%2C%20Ragati%20Rd%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske"
                 width="100%"
                 height="200"
@@ -176,76 +212,101 @@ const ContactPage = () => {
           </div>
 
           {/* ── Right col — form ── */}
-          <div className="bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-7 shadow-sm">
+          <div className="animate-on-scroll opacity-0 bg-white border border-[#e8e0d0] rounded-xl sm:rounded-2xl p-4 sm:p-7 shadow-sm">
             <div className="flex items-center gap-2 mb-1">
               <span className="block h-px w-4 bg-[#bfa06f]" />
               <span className="text-[0.6rem] sm:text-[0.65rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
-                Send a Message
+                Consultation Request
               </span>
             </div>
             <h2 className="text-sm sm:text-lg font-bold text-[#0d2340] mb-4 sm:mb-6">
-              We'll Respond Within 24 Hours
+              Send Us a Message
             </h2>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-3 sm:space-y-4">
 
-              {/* Name + Email */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* First + Last name */}
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelClass}>Full Name *</label>
+                  <label className={labelClass}>First Name *</label>
                   <input
-                    type="text" name="name" value={formData.name}
-                    onChange={handleChange} placeholder="Your full name"
-                    required autoComplete="name" className={inputClass}
+                    type="text" name="firstName" value={formData.firstName}
+                    onChange={handleInputChange} placeholder="First name"
+                    autoComplete="given-name" className={inputClass('firstName')}
                   />
+                  {validationErrors.firstName && (
+                    <p className="text-red-500 text-[0.6rem] mt-1">{validationErrors.firstName}</p>
+                  )}
                 </div>
+                <div>
+                  <label className={labelClass}>Last Name *</label>
+                  <input
+                    type="text" name="lastName" value={formData.lastName}
+                    onChange={handleInputChange} placeholder="Last name"
+                    autoComplete="family-name" className={inputClass('lastName')}
+                  />
+                  {validationErrors.lastName && (
+                    <p className="text-red-500 text-[0.6rem] mt-1">{validationErrors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Email + Phone */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Email *</label>
                   <input
                     type="email" name="email" value={formData.email}
-                    onChange={handleChange} placeholder="you@example.com"
-                    required autoComplete="email" className={inputClass}
+                    onChange={handleInputChange} placeholder="you@example.com"
+                    autoComplete="email" className={inputClass('email')}
                   />
+                  {validationErrors.email && (
+                    <p className="text-red-500 text-[0.6rem] mt-1">{validationErrors.email}</p>
+                  )}
                 </div>
-              </div>
-
-              {/* Phone + Subject */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Phone</label>
                   <input
                     type="tel" name="phone" value={formData.phone}
-                    onChange={handleChange} placeholder="+254 700 000 000"
-                    autoComplete="tel" className={inputClass}
+                    onChange={handleInputChange} placeholder="+254 700 000 000"
+                    autoComplete="tel" className={inputClass('phone')}
                   />
+                  {validationErrors.phone && (
+                    <p className="text-red-500 text-[0.6rem] mt-1">{validationErrors.phone}</p>
+                  )}
                 </div>
-                <div>
-                  <label className={labelClass}>Subject *</label>
-                  <div className="relative">
-                    <select
-                      name="subject" value={formData.subject}
-                      onChange={handleChange} required
-                      className={`${inputClass} appearance-none pr-9 cursor-pointer`}
-                    >
-                      <option value="">Select a subject…</option>
-                      {[
-                        'General Inquiry',
-                        'Corporate Law',
-                        'Litigation & Dispute Resolution',
-                        'Real Estate & Conveyancing',
-                        'Employment & Labour Law',
-                        'Family & Succession Law',
-                        'Criminal Law',
-                        'Other',
-                      ].map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                    <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-                      <svg className="h-3.5 w-3.5 text-[#6a6a6a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
+              </div>
+
+              {/* Legal service */}
+              <div>
+                <label className={labelClass}>Legal Service *</label>
+                <div className="relative">
+                  <select
+                    name="legalService" value={formData.legalService}
+                    onChange={handleInputChange}
+                    className={`${inputClass('legalService')} appearance-none pr-9 cursor-pointer`}
+                  >
+                    <option value="">Select a service…</option>
+                    {[
+                      'Civil and Criminal Litigation',
+                      'Alternative Dispute Resolution',
+                      'Commercial and Corporate Law',
+                      'Bank Securities and Real Estate',
+                      'Employment Law', 'Family Law', 'Energy Law',
+                      'Construction Law', 'Health and Medical Law',
+                      'Finance and Banking Law', 'Insurance and Personal Injury',
+                      'Agricultural Law', 'Legal Consultancy', 'Other',
+                    ].map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                    <svg className="h-3.5 w-3.5 text-[#6a6a6a]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
                 </div>
+                {validationErrors.legalService && (
+                  <p className="text-red-500 text-[0.6rem] mt-1">{validationErrors.legalService}</p>
+                )}
               </div>
 
               {/* Message */}
@@ -253,10 +314,19 @@ const ContactPage = () => {
                 <label className={labelClass}>Message *</label>
                 <textarea
                   name="message" value={formData.message}
-                  onChange={handleChange} rows={5} required
+                  onChange={handleInputChange} rows={5} maxLength={1000}
                   placeholder="Please describe your legal matter…"
-                  className={`${inputClass} resize-none`}
+                  className={`${inputClass('message')} resize-none`}
                 />
+                <div className="flex items-center justify-between mt-1">
+                  {validationErrors.message
+                    ? <p className="text-red-500 text-[0.6rem]">{validationErrors.message}</p>
+                    : <span />
+                  }
+                  <span className="text-[0.6rem] text-[#6a6a6a] ml-auto">
+                    {formData.message.length}/1000
+                  </span>
+                </div>
               </div>
 
               {/* Submit */}
@@ -280,29 +350,35 @@ const ContactPage = () => {
             </form>
 
             {/* Status banners */}
+            {submitStatus === 'validation_error' && (
+              <div className="mt-4 flex items-start gap-3 bg-orange-50 border border-orange-200 rounded-xl px-4 py-3">
+                <AlertCircle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-xs font-semibold text-orange-800">Please check your form</p>
+                  <p className="text-[0.65rem] text-orange-700 mt-0.5">All required fields must be completed.</p>
+                </div>
+              </div>
+            )}
             {submitStatus === 'success' && (
               <div className="mt-4 flex items-start gap-3 bg-[#bfa06f]/8 border border-[#bfa06f]/30 rounded-xl px-4 py-3">
                 <CheckCircle className="h-4 w-4 text-[#bfa06f] mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-xs font-semibold text-[#0d2340]">Message sent successfully</p>
-                  <p className="text-[0.65rem] text-[#4a4a4a] mt-0.5">We'll get back to you as soon as possible.</p>
+                  <p className="text-xs font-semibold text-[#0d2340]">Email client opened</p>
+                  <p className="text-[0.65rem] text-[#4a4a4a] mt-0.5">
+                    Please send the email to complete your inquiry. We'll respond within 24 hours.
+                  </p>
                 </div>
               </div>
             )}
             {submitStatus === 'error' && (
               <div className="mt-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                 <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-red-800">Failed to send</p>
-                  <p className="text-[0.65rem] text-red-700 mt-0.5">{errorMessage}</p>
+                <div>
+                  <p className="text-xs font-semibold text-red-800">Unable to open email client</p>
+                  <p className="text-[0.65rem] text-red-700 mt-0.5">
+                    Please email us directly at Info@soklaw.co.ke
+                  </p>
                 </div>
-                <button
-                  onClick={() => setSubmitStatus('idle')}
-                  className="flex-shrink-0 flex items-center gap-1 text-[0.65rem] font-semibold text-red-600 hover:text-red-800 transition-colors"
-                >
-                  <RefreshCw className="h-3 w-3" />
-                  Retry
-                </button>
               </div>
             )}
           </div>
@@ -310,6 +386,18 @@ const ContactPage = () => {
       </div>
 
       <Footer />
+
+      <style>{`
+        .animate-on-scroll {
+          transform: translateY(14px);
+          transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .animate-fade-in-up {
+          opacity: 1 !important;
+          transform: translateY(0) !important;
+        }
+        select option { color: #1a1a1a; }
+      `}</style>
     </div>
   );
 };
