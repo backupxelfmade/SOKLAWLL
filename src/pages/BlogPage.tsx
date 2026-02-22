@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowRight, ArrowLeft } from 'lucide-react';
-import { getAllBlogPosts, BlogPost } from '../services/bloggerApi';
+import { getAllBlogPosts, BlogPost } from '../services/caisyApi';
 import Footer from '../components/Footer';
 
 const BlogPage: React.FC = () => {
