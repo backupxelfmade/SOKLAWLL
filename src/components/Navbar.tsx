@@ -95,7 +95,7 @@ const Navbar = () => {
                   isScrolled ? 'text-[#7a6245]' : 'text-white/70'
                 }`}
               >
-                Simiyu, Opondo, Kiranga & Co. Advocates
+                Simiyu, Opondo, Kiranga & Advocates
               </p>
             </Link>
 
