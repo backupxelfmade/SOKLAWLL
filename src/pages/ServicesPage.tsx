@@ -21,7 +21,7 @@ const ServicesPage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#f9f7f1] pt-20 sm:pt-24">
+      <div className="min-h-screen bg-white pt-20 sm:pt-24">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-14 lg:py-20">
 
           {/* ── Back button ── */}
@@ -41,12 +41,13 @@ const ServicesPage = () => {
                 What We Do
               </span>
             </div>
-            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
+            {/* Navy blue heading matching screenshot */}
+            <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#0d2340] leading-tight">
               Our Legal Services
             </h1>
-            <p className="hidden sm:block text-base text-[#4a4a4a] max-w-xl mt-3 leading-relaxed">
-              Comprehensive legal solutions across various practice areas, ensuring
-              expert representation for all your legal needs.
+            <p className="text-sm sm:text-base text-[#4a4a4a] max-w-xl mt-3 leading-relaxed">
+              Comprehensive legal solutions across a broad range of practice areas—expert
+              representation tailored to your needs.
             </p>
           </div>
 
@@ -60,7 +61,7 @@ const ServicesPage = () => {
 
           {/* ── Loading skeleton ── */}
           {loading ? (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-5 lg:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
@@ -70,7 +71,7 @@ const ServicesPage = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-5 lg:gap-6">
               {services.map((service: any) => (
                 <div
                   key={service.id}
@@ -93,7 +94,7 @@ const ServicesPage = () => {
                     style={{ backgroundImage: `url(${service.header_image || service.headerImage})` }}
                   />
 
-                  {/* Lighter gradient — less black, more image visible */}
+                  {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent group-hover:from-black/65 transition-all duration-500" />
 
                   {/* Arrow chip */}
@@ -111,7 +112,7 @@ const ServicesPage = () => {
                     <div className="h-0.5 bg-[#d4b483] mb-1.5 sm:mb-2.5 transition-all duration-300
                       w-3 sm:w-5 group-hover:w-5 sm:group-hover:w-8" />
 
-                    {/* Title — bright white with text shadow for legibility */}
+                    {/* Title */}
                     <h3
                       className="font-bold leading-tight text-white
                         text-[0.65rem] sm:text-lg lg:text-2xl xl:text-3xl
