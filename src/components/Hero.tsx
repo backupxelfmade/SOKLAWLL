@@ -197,7 +197,7 @@ const Hero = () => {
             }`}
             style={{ ...stagger(3), textShadow: '0 1px 12px rgba(0,0,0,0.4)' }}
           >
-            Don't navigate Kenya's legal system alone. SOK Law delivers
+            Don't navigate Kenya's legal system alone. SOKLaw delivers
             strategic, battle-tested representation across litigation,
             corporate, real estate, family law, and more.
           </p>
