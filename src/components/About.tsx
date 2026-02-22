@@ -77,25 +77,26 @@ const About = () => {
           </h2>
         </div>
 
-        {/* ── Layout ── */}
+        {/* ── Two-column layout ── */}
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 xl:gap-20 items-start lg:items-center">
 
           {/* ── Image col ── */}
           <div className="animate-on-scroll opacity-0 relative">
+            {/* Decorative border frame */}
             <div className="absolute -inset-1.5 sm:-inset-3 rounded-xl sm:rounded-3xl border border-[#bfa06f]/20 pointer-events-none" />
+            {/* Decorative bg shape — desktop only */}
             <div className="hidden sm:block absolute -bottom-4 -right-4 w-2/3 h-2/3 rounded-3xl bg-[#bfa06f]/8 pointer-events-none" />
 
             <img
               loading="lazy"
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
               alt="SOK Law Associates"
-              className="relative w-full rounded-lg sm:rounded-2xl object-cover shadow-md sm:shadow-lg"
-              style={{
-                height: '200px',
-                maxHeight: '200px',
-                objectFit: 'cover',
-                objectPosition: 'center 30%',
-              }}
+              className="
+                relative w-full object-cover shadow-md sm:shadow-lg
+                rounded-lg sm:rounded-2xl
+                h-[200px] sm:h-[380px] lg:h-[460px]
+              "
+              style={{ objectPosition: 'center 30%' }}
               onError={(e) => {
                 const t = e.target as HTMLImageElement;
                 t.style.display = 'none';
@@ -108,7 +109,7 @@ const About = () => {
             />
 
             {/* Floating badge */}
-            <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 lg:-bottom-5 lg:left-8 bg-white rounded-lg sm:rounded-xl shadow-md px-2.5 sm:px-4 py-1.5 sm:py-3 flex items-center gap-2 border border-[#e8e0d0]">
+            <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 lg:-bottom-5 lg:left-8 z-10 bg-white rounded-lg sm:rounded-xl shadow-md px-2.5 sm:px-4 py-1.5 sm:py-3 flex items-center gap-2 border border-[#e8e0d0]">
               <div className="flex items-center justify-center w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-[#bfa06f]/10 flex-shrink-0">
                 <Award className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]" />
               </div>
@@ -120,7 +121,7 @@ const About = () => {
           </div>
 
           {/* ── Content col ── */}
-          <div className="space-y-4 sm:space-y-8">
+          <div className="space-y-4 sm:space-y-8 lg:pt-0">
 
             {/* Body copy */}
             <div className="animate-on-scroll opacity-0 space-y-2 sm:space-y-4">
@@ -144,7 +145,7 @@ const About = () => {
             {/* Divider */}
             <div className="animate-on-scroll opacity-0 h-px w-full bg-[#e8e0d0]" />
 
-            {/* Stats grid — 4-col on mobile like a shelf row */}
+            {/* Stats grid — 4-col shelf on mobile, 2-col on desktop */}
             <div className="grid grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-4">
               {stats.map((stat, i) => {
                 const Icon = stat.icon;
@@ -153,8 +154,8 @@ const About = () => {
                     key={i}
                     className="animate-on-scroll opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-lg sm:rounded-2xl p-2.5 sm:p-5 transition-all duration-200 hover:shadow-md"
                   >
-                    {/* Icon — hidden on mobile for compactness */}
-                    <div className="hidden sm:flex items-center justify-between mb-3">
+                    {/* Icon — desktop only */}
+                    <div className="hidden sm:flex items-center mb-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#bfa06f]/10 group-hover:bg-[#bfa06f]/20 transition-colors duration-200">
                         <Icon className="h-4 w-4 text-[#bfa06f]" />
                       </div>
