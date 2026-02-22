@@ -54,83 +54,87 @@ const About = () => {
   }, []);
 
   const stats = [
-    { icon: Clock,      label: 'Years of Experience', value: 15,   suffix: '+' },
-    { icon: Award,      label: 'Cases Won',            value: 500,  suffix: '+' },
-    { icon: Users,      label: 'Satisfied Clients',    value: 1000, suffix: '+' },
-    { icon: TrendingUp, label: 'Success Rate',         value: 98,   suffix: '%' },
+    { icon: Clock,      label: 'Years Experience', value: 15,   suffix: '+' },
+    { icon: Award,      label: 'Cases Won',         value: 500,  suffix: '+' },
+    { icon: Users,      label: 'Happy Clients',     value: 1000, suffix: '+' },
+    { icon: TrendingUp, label: 'Success Rate',      value: 98,   suffix: '%' },
   ];
 
   return (
-    <section ref={sectionRef} id="about" className="py-14 sm:py-20 lg:py-28 bg-[#f9f7f1]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+    <section ref={sectionRef} id="about" className="py-10 sm:py-20 lg:py-28 bg-[#f9f7f1]">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
 
         {/* ── Section header ── */}
-        <div className="mb-10 sm:mb-14">
-          <div className="animate-on-scroll opacity-0 flex items-center gap-3 mb-3">
-            <span className="block h-px w-6 bg-[#bfa06f]" />
-            <span className="text-[0.65rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
+        <div className="mb-6 sm:mb-14">
+          <div className="animate-on-scroll opacity-0 flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
+            <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
               Who We Are
             </span>
           </div>
-          <h2 className="animate-on-scroll opacity-0 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
+          <h2 className="animate-on-scroll opacity-0 text-xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a1a1a] leading-tight">
             About SOK Law Associates
           </h2>
         </div>
 
-        {/* ── Two-column layout ── */}
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-20 items-start lg:items-center">
+        {/* ── Layout ── */}
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-10 lg:gap-16 xl:gap-20 items-start lg:items-center">
 
           {/* ── Image col ── */}
           <div className="animate-on-scroll opacity-0 relative">
-            {/* Decorative border frame */}
-            <div className="absolute -inset-2 sm:-inset-3 rounded-2xl sm:rounded-3xl border border-[#bfa06f]/20 pointer-events-none" />
-            {/* Decorative bg shape — hidden on mobile to avoid overflow */}
+            <div className="absolute -inset-1.5 sm:-inset-3 rounded-xl sm:rounded-3xl border border-[#bfa06f]/20 pointer-events-none" />
             <div className="hidden sm:block absolute -bottom-4 -right-4 w-2/3 h-2/3 rounded-3xl bg-[#bfa06f]/8 pointer-events-none" />
 
             <img
               loading="lazy"
               src="https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg"
               alt="SOK Law Associates"
-              className="relative w-full rounded-xl sm:rounded-2xl object-cover object-center shadow-lg"
-              style={{ maxHeight: '320px', objectPosition: 'center 30%' }}
+              className="relative w-full rounded-lg sm:rounded-2xl object-cover shadow-md sm:shadow-lg"
+              style={{
+                height: '200px',
+                maxHeight: '200px',
+                objectFit: 'cover',
+                objectPosition: 'center 30%',
+              }}
               onError={(e) => {
                 const t = e.target as HTMLImageElement;
                 t.style.display = 'none';
                 if (t.parentElement) {
                   t.parentElement.style.background = 'linear-gradient(135deg, #bfa06f 0%, #8b7355 100%)';
-                  t.parentElement.style.minHeight = '280px';
-                  t.parentElement.style.borderRadius = '1rem';
+                  t.parentElement.style.minHeight = '200px';
+                  t.parentElement.style.borderRadius = '0.75rem';
                 }
               }}
             />
 
-            {/* Floating badge — sits inside image bounds on mobile */}
-            <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 lg:-bottom-5 lg:left-8 bg-white rounded-xl shadow-md px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2.5 border border-[#e8e0d0]">
-              <div className="flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-[#bfa06f]/10 flex-shrink-0">
-                <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+            {/* Floating badge */}
+            <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 lg:-bottom-5 lg:left-8 bg-white rounded-lg sm:rounded-xl shadow-md px-2.5 sm:px-4 py-1.5 sm:py-3 flex items-center gap-2 border border-[#e8e0d0]">
+              <div className="flex items-center justify-center w-6 h-6 sm:w-9 sm:h-9 rounded-full bg-[#bfa06f]/10 flex-shrink-0">
+                <Award className="h-3 w-3 sm:h-4 sm:w-4 text-[#bfa06f]" />
               </div>
               <div>
-                <p className="text-[11px] sm:text-xs font-bold text-[#1a1a1a] leading-tight">Est. 2009</p>
-                <p className="text-[9px] sm:text-[10px] text-gray-400 leading-tight">15+ years of practice</p>
+                <p className="text-[10px] sm:text-xs font-bold text-[#1a1a1a] leading-tight">Est. 2009</p>
+                <p className="text-[8px] sm:text-[10px] text-gray-400 leading-tight">15+ years of practice</p>
               </div>
             </div>
           </div>
 
           {/* ── Content col ── */}
-          <div className="space-y-6 sm:space-y-8 pt-3 lg:pt-0">
+          <div className="space-y-4 sm:space-y-8">
 
             {/* Body copy */}
-            <div className="animate-on-scroll opacity-0 space-y-3 sm:space-y-4">
-              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-[#1a1a1a]">
+            <div className="animate-on-scroll opacity-0 space-y-2 sm:space-y-4">
+              <h3 className="text-base sm:text-xl md:text-2xl font-bold text-[#1a1a1a]">
                 Excellence in Legal Practice Since 2009
               </h3>
-              <p className="text-[#4a4a4a] leading-relaxed text-sm sm:text-base">
+              <p className="text-[#4a4a4a] leading-relaxed text-xs sm:text-base">
                 SOK Law Associates has been at the forefront of legal practice in Kenya,
                 providing comprehensive legal solutions to individuals, corporations, and
                 institutions. Our commitment to excellence, integrity, and client
                 satisfaction has made us one of the most trusted law firms in the region.
               </p>
-              <p className="text-[#4a4a4a] leading-relaxed text-sm sm:text-base">
+              {/* Second paragraph — desktop only */}
+              <p className="hidden sm:block text-[#4a4a4a] leading-relaxed text-base">
                 We combine deep legal expertise with innovative approaches to deliver
                 outstanding results. Our experienced team specialises in a broad range
                 of practice areas, handling complex matters with precision and care.
@@ -140,28 +144,30 @@ const About = () => {
             {/* Divider */}
             <div className="animate-on-scroll opacity-0 h-px w-full bg-[#e8e0d0]" />
 
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            {/* Stats grid — 4-col on mobile like a shelf row */}
+            <div className="grid grid-cols-4 sm:grid-cols-2 gap-2 sm:gap-4">
               {stats.map((stat, i) => {
                 const Icon = stat.icon;
                 return (
                   <div
                     key={i}
-                    className="animate-on-scroll opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-xl sm:rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:shadow-md"
+                    className="animate-on-scroll opacity-0 group bg-white border border-[#e8e0d0] hover:border-[#bfa06f]/40 rounded-lg sm:rounded-2xl p-2.5 sm:p-5 transition-all duration-200 hover:shadow-md"
                   >
-                    <div className="flex items-center justify-between mb-2 sm:mb-3">
-                      <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#bfa06f]/10 group-hover:bg-[#bfa06f]/20 transition-colors duration-200">
-                        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#bfa06f]" />
+                    {/* Icon — hidden on mobile for compactness */}
+                    <div className="hidden sm:flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#bfa06f]/10 group-hover:bg-[#bfa06f]/20 transition-colors duration-200">
+                        <Icon className="h-4 w-4 text-[#bfa06f]" />
                       </div>
                     </div>
+
                     <div
-                      className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1a1a1a] leading-none mb-1 count-up"
+                      className="text-base sm:text-2xl md:text-3xl font-bold text-[#1a1a1a] leading-none mb-0.5 sm:mb-1 count-up"
                       data-count-to={stat.value}
                       data-suffix={stat.suffix}
                     >
                       0
                     </div>
-                    <div className="text-[10px] sm:text-xs text-gray-400 font-medium leading-tight">
+                    <div className="text-[9px] sm:text-xs text-gray-400 font-medium leading-tight">
                       {stat.label}
                     </div>
                   </div>
