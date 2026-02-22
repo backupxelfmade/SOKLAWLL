@@ -22,19 +22,19 @@ const ServicesPage = () => {
   return (
     <>
       <div className="min-h-screen bg-[#f9f7f1] pt-20 sm:pt-24">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 py-8 sm:py-14 lg:py-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10 py-6 sm:py-14 lg:py-20">
 
           {/* ── Back button ── */}
           <button
             onClick={handleBackToHome}
-            className="group inline-flex items-center gap-2 text-[0.7rem] sm:text-sm font-semibold text-[#4a4a4a] hover:text-[#bfa06f] transition-colors duration-200 mb-7 sm:mb-12"
+            className="group inline-flex items-center gap-2 text-[0.7rem] sm:text-sm font-semibold text-[#4a4a4a] hover:text-[#bfa06f] transition-colors duration-200 mb-5 sm:mb-12"
           >
-            <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft className="h-3 w-3 sm:h-3.5 sm:w-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
 
           {/* ── Section header ── */}
-          <div className="mb-8 sm:mb-14">
+          <div className="mb-5 sm:mb-14">
             <div className="flex items-center gap-2 mb-2 sm:mb-3">
               <span className="block h-px w-5 sm:w-6 bg-[#bfa06f]" />
               <span className="text-[0.6rem] sm:text-[0.7rem] font-semibold uppercase tracking-widest text-[#bfa06f]">
@@ -52,27 +52,26 @@ const ServicesPage = () => {
 
           {/* ── Error banner ── */}
           {error && (
-            <div className="flex items-start gap-3 bg-white border border-[#e8e0d0] rounded-xl px-4 py-3 mb-6 sm:mb-8 max-w-lg">
-              <AlertCircle className="h-4 w-4 text-[#bfa06f] mt-0.5 flex-shrink-0" />
-              <p className="text-xs sm:text-sm text-[#4a4a4a]">
-                Displaying default services. {error}
-              </p>
+            <div className="flex items-start gap-3 bg-white border border-[#e8e0d0] rounded-xl px-3 py-2.5 mb-4 sm:mb-8 max-w-lg">
+              <AlertCircle className="h-3.5 w-3.5 text-[#bfa06f] mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-[#4a4a4a]">Displaying default services. {error}</p>
             </div>
           )}
 
-          {/* ── Loading ── */}
+          {/* ── Loading skeleton ── */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
               {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl sm:rounded-3xl overflow-hidden min-h-[220px] sm:min-h-[340px] bg-[#e8e0d0]"
+                  className="animate-pulse rounded-xl sm:rounded-3xl bg-[#e8e0d0]"
+                  style={{ height: 'clamp(140px, 30vw, 400px)' }}
                 />
               ))}
             </div>
           ) : (
             /* ── Services grid ── */
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 lg:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-2 gap-2.5 sm:gap-5 lg:gap-6">
               {services.map((service: any) => (
                 <div
                   key={service.id}
@@ -86,9 +85,8 @@ const ServicesPage = () => {
                     }
                   }}
                   aria-label={`Learn more about ${service.title}`}
-                  className="relative overflow-hidden rounded-2xl sm:rounded-3xl group cursor-pointer
-                    min-h-[200px] sm:min-h-[360px] lg:min-h-[400px]
-                    shadow-sm hover:shadow-xl transition-all duration-500"
+                  className="relative overflow-hidden rounded-xl sm:rounded-3xl group cursor-pointer shadow-sm hover:shadow-xl transition-all duration-500"
+                  style={{ height: 'clamp(140px, 30vw, 420px)' }}
                 >
                   {/* Background image */}
                   <div
@@ -97,36 +95,42 @@ const ServicesPage = () => {
                   />
 
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10 group-hover:from-black/75 transition-all duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/5 group-hover:from-black/75 transition-all duration-500" />
 
-                  {/* Gold top-right arrow chip */}
-                  <div className="absolute top-4 right-4 sm:top-5 sm:right-5">
-                    <div className="flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#bfa06f] group-hover:bg-white transition-colors duration-300 shadow-md">
-                      <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-white group-hover:text-[#bfa06f] transition-colors duration-300 group-hover:translate-x-0.5 transition-transform" />
+                  {/* Arrow chip — top right */}
+                  <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 lg:top-5 lg:right-5">
+                    <div className="flex items-center justify-center rounded-full bg-[#bfa06f] group-hover:bg-white transition-colors duration-300 shadow-md
+                      w-7 h-7 sm:w-9 sm:h-9 lg:w-11 lg:h-11">
+                      <ArrowRight className="text-white group-hover:text-[#bfa06f] transition-colors duration-300
+                        h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5" />
                     </div>
                   </div>
 
                   {/* Card content */}
-                  <div className="absolute inset-0 p-4 sm:p-7 flex flex-col justify-end">
+                  <div className="absolute inset-0 flex flex-col justify-end p-2.5 sm:p-5 lg:p-7">
                     {/* Gold rule */}
-                    <div className="w-5 sm:w-6 h-0.5 bg-[#bfa06f] mb-2 sm:mb-3 transition-all duration-300 group-hover:w-8 sm:group-hover:w-10" />
+                    <div className="h-0.5 bg-[#bfa06f] mb-1.5 sm:mb-2.5 transition-all duration-300
+                      w-3 sm:w-5 group-hover:w-5 sm:group-hover:w-8" />
 
                     <h3 className="text-white font-bold leading-tight
-                      text-base sm:text-2xl lg:text-3xl
-                      group-hover:text-white transition-colors">
+                      text-[0.65rem] sm:text-lg lg:text-2xl xl:text-3xl
+                      line-clamp-2 sm:line-clamp-none">
                       {service.title}
                     </h3>
 
-                    {/* Excerpt — shown on hover on desktop */}
+                    {/* Excerpt — desktop hover only */}
                     {service.excerpt && (
-                      <p className="hidden sm:block text-white/0 group-hover:text-white/75 text-sm leading-relaxed mt-2 max-w-sm line-clamp-2 transition-all duration-300 max-h-0 group-hover:max-h-16 overflow-hidden">
+                      <p className="hidden sm:block text-white/0 group-hover:text-white/75
+                        text-xs sm:text-sm leading-relaxed mt-1.5 max-w-sm
+                        max-h-0 group-hover:max-h-12 overflow-hidden
+                        transition-all duration-300">
                         {service.excerpt}
                       </p>
                     )}
                   </div>
 
                   {/* Gold border on hover */}
-                  <div className="absolute inset-0 rounded-2xl sm:rounded-3xl border border-transparent group-hover:border-[#bfa06f]/30 transition-all duration-300 pointer-events-none" />
+                  <div className="absolute inset-0 rounded-xl sm:rounded-3xl border border-transparent group-hover:border-[#bfa06f]/30 transition-all duration-300 pointer-events-none" />
                 </div>
               ))}
             </div>
