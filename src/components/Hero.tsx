@@ -10,16 +10,19 @@ const Hero = () => {
       image: 'https://i.postimg.cc/Px2cZQf5/7-X2-A2923-1.jpg',
       title: 'Expert Legal Representation',
       position: 'center 30%',
+      mobilePosition: 'center 20%',
     },
     {
       image: 'https://i.postimg.cc/0NGHt0hF/7X2A2913-(1).jpg',
       title: 'Comprehensive Legal Solutions',
       position: 'center 30%',
+      mobilePosition: 'center 15%',
     },
     {
       image: 'https://i.postimg.cc/Wzd9ZRf5/7X2A2982.jpg',
       title: 'Your Trusted Legal Partner',
       position: 'center 50%',
+      mobilePosition: 'center 30%',
     },
   ];
 
@@ -61,7 +64,8 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative w-full min-h-[75vh] md:min-h-[85vh] lg:h-screen flex items-end overflow-hidden"
+      className="relative w-full overflow-hidden flex items-end"
+      style={{ height: '100svh', minHeight: '560px', maxHeight: '900px' }}
       aria-label="Hero"
     >
       {/* ── Background slides ── */}
@@ -81,7 +85,7 @@ const Hero = () => {
           <img
             src={slide.image}
             alt={slide.title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className={`absolute inset-0 w-full h-full object-cover hero-img-${i}`}
             style={{ objectPosition: slide.position }}
             loading={i === 0 ? 'eager' : 'lazy'}
             onLoad={() =>
@@ -99,7 +103,6 @@ const Hero = () => {
                   'linear-gradient(135deg,#bfa06f 0%,#8b7355 100%)';
             }}
           />
-          {/* Directional overlay — heavier bottom-left for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-tr from-black/80 via-black/50 to-black/20" />
         </div>
       ))}
@@ -116,7 +119,7 @@ const Hero = () => {
         aria-label="Next slide"
       />
 
-      {/* ── Main content — anchored to bottom ── */}
+      {/* ── Main content ── */}
       <div className="relative z-20 w-full px-5 sm:px-8 lg:px-16 pb-14 sm:pb-16 md:pb-20">
         <div className="max-w-2xl text-left mx-auto sm:mx-0">
 
@@ -124,7 +127,7 @@ const Hero = () => {
           <div className="flex items-center gap-2 mb-4">
             <span className="block h-px w-6 bg-[#bfa06f]" />
             <span className="text-[0.7rem] sm:text-xs font-semibold uppercase tracking-widest text-[#bfa06f]">
-              Toronto-Based Law Firm
+              Nairobi-Based Law Firm
             </span>
           </div>
 
@@ -144,7 +147,6 @@ const Hero = () => {
 
           {/* CTA row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            {/* Primary */}
             <button
               onClick={() => scrollTo('#contact')}
               className="group flex items-center justify-center gap-2 bg-[#bfa06f] hover:bg-[#a08a5f] text-white font-semibold text-sm sm:text-base px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
@@ -153,8 +155,6 @@ const Hero = () => {
               <span>Book a Consultation</span>
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </button>
-
-            {/* Secondary — bordered */}
             <button
               onClick={() => scrollTo('#services')}
               className="group flex items-center justify-center sm:justify-start gap-2 border border-white/40 hover:border-white/70 hover:bg-white/10 text-white/90 hover:text-white font-medium text-sm sm:text-base px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-200"
@@ -166,7 +166,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* ── Slide indicators — centered mobile, bottom-right desktop ── */}
+      {/* ── Slide indicators ── */}
       <div className="absolute bottom-5 z-30 flex items-center gap-1.5 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-8 lg:right-16 sm:bottom-6 lg:bottom-8">
         {slides.map((_, i) => (
           <button
@@ -182,6 +182,14 @@ const Hero = () => {
           />
         ))}
       </div>
+
+      <style>{`
+        @media (max-width: 639px) {
+          .hero-img-0 { object-position: ${slides[0].mobilePosition} !important; }
+          .hero-img-1 { object-position: ${slides[1].mobilePosition} !important; }
+          .hero-img-2 { object-position: ${slides[2].mobilePosition} !important; }
+        }
+      `}</style>
     </section>
   );
 };
